@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mystic Tarot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stars"></div>
+
+  <header>
+    <h1>Mystic Tarot</h1>
+    <p class="subtitle">Unveil the wisdom of the cards</p>
+  </header>
+
+  <main>
+    <section id="spread-picker">
+      <h2>Choose Your Spread</h2>
+      <div class="spread-options">
+        <button class="spread-btn active" data-spread="single">
+          <span class="spread-icon">&#9734;</span>
+          <span class="spread-label">Single Card</span>
+          <span class="spread-desc">Quick daily insight</span>
+        </button>
+        <button class="spread-btn" data-spread="three">
+          <span class="spread-icon">&#9789; &#9788; &#9790;</span>
+          <span class="spread-label">Three Cards</span>
+          <span class="spread-desc">Past &middot; Present &middot; Future</span>
+        </button>
+        <button class="spread-btn" data-spread="five">
+          <span class="spread-icon">&#10017;</span>
+          <span class="spread-label">Five Cards</span>
+          <span class="spread-desc">Cross of Truth</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="question-section">
+      <label for="question-input">Focus on a question or leave blank for general guidance</label>
+      <div class="question-row">
+        <input type="text" id="question-input" placeholder="What does the universe want me to know?">
+        <button id="draw-btn">Draw Cards</button>
+      </div>
+    </section>
+
+    <section id="reading-area" class="hidden">
+      <div id="card-spread"></div>
+      <div id="reading-summary" class="hidden">
+        <h2>Your Reading</h2>
+        <p id="summary-text"></p>
+      </div>
+      <button id="reset-btn" class="hidden">New Reading</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mystic Tarot &mdash; for entertainment and reflection</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
