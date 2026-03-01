@@ -3,48 +3,52 @@
    Full 78-card deck, spreads, flip animations, and readings.
    ================================================================ */
 
+// ── Card Image Base URL ─────────────────────────────────────────
+// Rider-Waite-Smith public domain images via metabismuth/tarot-json
+const IMG_BASE = "https://raw.githubusercontent.com/metabismuth/tarot-json/master/cards/";
+
 // ── Tarot Deck Data ─────────────────────────────────────────────
 
 const MAJOR_ARCANA = [
-  { name: "The Fool",            numeral: "0",    art: "🃏", upright: "New beginnings, spontaneity, a free spirit", reversed: "Recklessness, holding back, fearfulness" },
-  { name: "The Magician",        numeral: "I",    art: "🎩", upright: "Willpower, creation, manifestation", reversed: "Manipulation, trickery, untapped potential" },
-  { name: "The High Priestess",  numeral: "II",   art: "🌙", upright: "Intuition, mystery, inner knowledge", reversed: "Secrets withheld, disconnection from intuition" },
-  { name: "The Empress",         numeral: "III",  art: "👑", upright: "Abundance, nurturing, fertility", reversed: "Dependence, smothering, creative block" },
-  { name: "The Emperor",         numeral: "IV",   art: "🏛️", upright: "Authority, structure, stability", reversed: "Tyranny, rigidity, loss of control" },
-  { name: "The Hierophant",      numeral: "V",    art: "📿", upright: "Tradition, guidance, conformity", reversed: "Rebellion, subversiveness, new approaches" },
-  { name: "The Lovers",          numeral: "VI",   art: "💕", upright: "Love, harmony, partnerships", reversed: "Disharmony, imbalance, misalignment" },
-  { name: "The Chariot",         numeral: "VII",  art: "⚔️", upright: "Determination, willpower, triumph", reversed: "Lack of direction, aggression, defeat" },
-  { name: "Strength",            numeral: "VIII", art: "🦁", upright: "Courage, patience, inner strength", reversed: "Self-doubt, weakness, insecurity" },
-  { name: "The Hermit",          numeral: "IX",   art: "🏔️", upright: "Soul-searching, introspection, solitude", reversed: "Isolation, loneliness, withdrawal" },
-  { name: "Wheel of Fortune",    numeral: "X",    art: "🎡", upright: "Change, cycles, destiny", reversed: "Bad luck, resistance to change, broken cycles" },
-  { name: "Justice",             numeral: "XI",   art: "⚖️", upright: "Fairness, truth, accountability", reversed: "Unfairness, dishonesty, lack of accountability" },
-  { name: "The Hanged Man",      numeral: "XII",  art: "🙃", upright: "Surrender, new perspective, letting go", reversed: "Stalling, resistance, indecision" },
-  { name: "Death",               numeral: "XIII", art: "💀", upright: "Transformation, endings, transition", reversed: "Resistance to change, stagnation, fear" },
-  { name: "Temperance",          numeral: "XIV",  art: "🏺", upright: "Balance, moderation, patience", reversed: "Excess, imbalance, lack of patience" },
-  { name: "The Devil",           numeral: "XV",   art: "😈", upright: "Shadow self, attachment, bondage", reversed: "Release, breaking free, reclaiming power" },
-  { name: "The Tower",           numeral: "XVI",  art: "🗼", upright: "Upheaval, revelation, sudden change", reversed: "Avoidance of disaster, fear of change" },
-  { name: "The Star",            numeral: "XVII", art: "⭐", upright: "Hope, inspiration, serenity", reversed: "Despair, discouragement, disconnection" },
-  { name: "The Moon",            numeral: "XVIII",art: "🌕", upright: "Illusion, intuition, the subconscious", reversed: "Confusion, fear, misinterpretation" },
-  { name: "The Sun",             numeral: "XIX",  art: "☀️", upright: "Joy, success, vitality", reversed: "Sadness, temporary setbacks, lack of clarity" },
-  { name: "Judgement",           numeral: "XX",   art: "📯", upright: "Reflection, reckoning, awakening", reversed: "Self-doubt, refusal of self-examination" },
-  { name: "The World",           numeral: "XXI",  art: "🌍", upright: "Completion, accomplishment, wholeness", reversed: "Incompletion, shortcuts, emptiness" },
+  { name: "The Fool",            numeral: "0",    img: "m00.jpg", upright: "New beginnings, spontaneity, a free spirit", reversed: "Recklessness, holding back, fearfulness" },
+  { name: "The Magician",        numeral: "I",    img: "m01.jpg", upright: "Willpower, creation, manifestation", reversed: "Manipulation, trickery, untapped potential" },
+  { name: "The High Priestess",  numeral: "II",   img: "m02.jpg", upright: "Intuition, mystery, inner knowledge", reversed: "Secrets withheld, disconnection from intuition" },
+  { name: "The Empress",         numeral: "III",  img: "m03.jpg", upright: "Abundance, nurturing, fertility", reversed: "Dependence, smothering, creative block" },
+  { name: "The Emperor",         numeral: "IV",   img: "m04.jpg", upright: "Authority, structure, stability", reversed: "Tyranny, rigidity, loss of control" },
+  { name: "The Hierophant",      numeral: "V",    img: "m05.jpg", upright: "Tradition, guidance, conformity", reversed: "Rebellion, subversiveness, new approaches" },
+  { name: "The Lovers",          numeral: "VI",   img: "m06.jpg", upright: "Love, harmony, partnerships", reversed: "Disharmony, imbalance, misalignment" },
+  { name: "The Chariot",         numeral: "VII",  img: "m07.jpg", upright: "Determination, willpower, triumph", reversed: "Lack of direction, aggression, defeat" },
+  { name: "Strength",            numeral: "VIII", img: "m08.jpg", upright: "Courage, patience, inner strength", reversed: "Self-doubt, weakness, insecurity" },
+  { name: "The Hermit",          numeral: "IX",   img: "m09.jpg", upright: "Soul-searching, introspection, solitude", reversed: "Isolation, loneliness, withdrawal" },
+  { name: "Wheel of Fortune",    numeral: "X",    img: "m10.jpg", upright: "Change, cycles, destiny", reversed: "Bad luck, resistance to change, broken cycles" },
+  { name: "Justice",             numeral: "XI",   img: "m11.jpg", upright: "Fairness, truth, accountability", reversed: "Unfairness, dishonesty, lack of accountability" },
+  { name: "The Hanged Man",      numeral: "XII",  img: "m12.jpg", upright: "Surrender, new perspective, letting go", reversed: "Stalling, resistance, indecision" },
+  { name: "Death",               numeral: "XIII", img: "m13.jpg", upright: "Transformation, endings, transition", reversed: "Resistance to change, stagnation, fear" },
+  { name: "Temperance",          numeral: "XIV",  img: "m14.jpg", upright: "Balance, moderation, patience", reversed: "Excess, imbalance, lack of patience" },
+  { name: "The Devil",           numeral: "XV",   img: "m15.jpg", upright: "Shadow self, attachment, bondage", reversed: "Release, breaking free, reclaiming power" },
+  { name: "The Tower",           numeral: "XVI",  img: "m16.jpg", upright: "Upheaval, revelation, sudden change", reversed: "Avoidance of disaster, fear of change" },
+  { name: "The Star",            numeral: "XVII", img: "m17.jpg", upright: "Hope, inspiration, serenity", reversed: "Despair, discouragement, disconnection" },
+  { name: "The Moon",            numeral: "XVIII",img: "m18.jpg", upright: "Illusion, intuition, the subconscious", reversed: "Confusion, fear, misinterpretation" },
+  { name: "The Sun",             numeral: "XIX",  img: "m19.jpg", upright: "Joy, success, vitality", reversed: "Sadness, temporary setbacks, lack of clarity" },
+  { name: "Judgement",           numeral: "XX",   img: "m20.jpg", upright: "Reflection, reckoning, awakening", reversed: "Self-doubt, refusal of self-examination" },
+  { name: "The World",           numeral: "XXI",  img: "m21.jpg", upright: "Completion, accomplishment, wholeness", reversed: "Incompletion, shortcuts, emptiness" },
 ];
 
 const SUITS = [
   {
-    name: "Wands", symbol: "🪄", element: "Fire",
+    name: "Wands", imgPrefix: "w", element: "Fire",
     keywords: { upright: "creativity, passion, action", reversed: "delays, lack of energy, hesitation" }
   },
   {
-    name: "Cups", symbol: "🏆", element: "Water",
+    name: "Cups", imgPrefix: "c", element: "Water",
     keywords: { upright: "emotion, intuition, relationships", reversed: "emotional loss, blocked feelings, detachment" }
   },
   {
-    name: "Swords", symbol: "🗡️", element: "Air",
+    name: "Swords", imgPrefix: "s", element: "Air",
     keywords: { upright: "intellect, truth, conflict", reversed: "confusion, harsh words, mental fog" }
   },
   {
-    name: "Pentacles", symbol: "🪙", element: "Earth",
+    name: "Pentacles", imgPrefix: "p", element: "Earth",
     keywords: { upright: "material, career, finances", reversed: "financial loss, insecurity, poor planning" }
   },
 ];
@@ -70,18 +74,8 @@ const COURT_MEANINGS = {
   King:   { meaning_up: "leadership and authority",     meaning_rev: "domineering and rigidity" },
 };
 
-const SUIT_ART = {
-  Wands:    ["🕯️","🕯️","🔥","🔥","🌋","🏕️","🌅","🎆","🧨","🎇"],
-  Cups:     ["🍷","🥂","🍾","🫖","🌊","💧","🌈","🏖️","🧊","🎊"],
-  Swords:   ["🔪","⚔️","🌩️","🛡️","💨","⛈️","🌪️","🕸️","🗡️","🏴"],
-  Pentacles:["💎","🪙","🏗️","🏦","📉","🎁","🌾","⛏️","🏡","👑"],
-};
-const COURT_ART = {
-  Wands:    { Page: "🧑‍🎨", Knight: "🏇", Queen: "👸", King: "🤴" },
-  Cups:     { Page: "🧑‍🎤", Knight: "🏇", Queen: "👸", King: "🤴" },
-  Swords:   { Page: "🧑‍✈️", Knight: "🏇", Queen: "👸", King: "🤴" },
-  Pentacles:{ Page: "🧑‍🌾", Knight: "🏇", Queen: "👸", King: "🤴" },
-};
+// Minor Arcana court card image numbers: Page=11, Knight=12, Queen=13, King=14
+const COURT_IMG_NUM = { Page: 11, Knight: 12, Queen: 13, King: 14 };
 
 function buildDeck() {
   const deck = MAJOR_ARCANA.map(c => ({
@@ -93,10 +87,11 @@ function buildDeck() {
   for (const suit of SUITS) {
     for (let i = 0; i < PIPS.length; i++) {
       const pip = PIPS[i];
+      const num = String(i + 1).padStart(2, "0");
       deck.push({
         name: `${pip.rank} of ${suit.name}`,
         numeral: `${suit.name}`,
-        art: SUIT_ART[suit.name][i],
+        img: `${suit.imgPrefix}${num}.jpg`,
         upright: `${pip.meaning_up} in ${suit.keywords.upright}`,
         reversed: `${pip.meaning_rev} in ${suit.keywords.reversed}`,
         type: "minor",
@@ -105,10 +100,11 @@ function buildDeck() {
     }
     for (const rank of COURT) {
       const cm = COURT_MEANINGS[rank];
+      const num = String(COURT_IMG_NUM[rank]).padStart(2, "0");
       deck.push({
         name: `${rank} of ${suit.name}`,
         numeral: `${suit.name}`,
-        art: COURT_ART[suit.name][rank],
+        img: `${suit.imgPrefix}${num}.jpg`,
         upright: `${cm.meaning_up} in ${suit.keywords.upright}`,
         reversed: `${cm.meaning_rev} in ${suit.keywords.reversed}`,
         type: "minor",
@@ -227,7 +223,7 @@ function drawReading() {
       </div>
       <div class="card-face card-front">
         <div class="card-numeral">${card.numeral}</div>
-        <div class="card-art">${card.art}</div>
+        <div class="card-art"><img src="${IMG_BASE}${card.img}" alt="${card.name}" draggable="false"></div>
         <div class="card-name">${card.name}</div>
         <div class="card-upright-reversed">${card.isReversed ? "Reversed" : "Upright"}</div>
       </div>
