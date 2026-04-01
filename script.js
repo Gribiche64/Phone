@@ -11,10 +11,12 @@ let syncInterval = null;
 const SYNC_MS = 5000;
 
 // ── Player Data ────────────────────────────────────────────────
+const DISQUALIFY_AT = 10;
+
 const DEFAULT_PLAYERS = [
-  { name: "Meg",     avatar: "🌴", score: -2 },
-  { name: "Lincoln", avatar: "🦩", score: -2 },
-  { name: "Kailer",  avatar: "🐊", score: -3 },
+  { name: "Meg",     avatar: "🌴", score: 2 },
+  { name: "Lincoln", avatar: "🦩", score: 2 },
+  { name: "Kailer",  avatar: "🐊", score: 3 },
 ];
 
 const SWEAR_REACTIONS = [
@@ -43,7 +45,7 @@ const GOOD_DEED_REACTIONS = [
   "The manatees approve!",
 ];
 
-const RANK_LABELS = ["Cleanest Mouth", "Middle of the Road", "Potty Mouth Champion"];
+const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
 
 // ── State ──────────────────────────────────────────────────────
 let players = DEFAULT_PLAYERS.map(p => ({ ...p }));
@@ -75,21 +77,25 @@ initSync().catch(() => {
 // ── Event Listeners ────────────────────────────────────────────
 swearBtn.addEventListener("click", () => {
   const idx = parseInt(playerSelect.value, 10);
-  players[idx].score -= 1;
-  const reaction = pickRandom(SWEAR_REACTIONS);
+  if (players[idx].score >= DISQUALIFY_AT) return;
+  players[idx].score += 1;
+  const reaction = players[idx].score >= DISQUALIFY_AT
+    ? "DISQUALIFIED! 10 strikes and you're OUT!"
+    : pickRandom(SWEAR_REACTIONS);
   addHistory(players[idx].name, "swear", reaction);
   renderAll();
-  animateCard(idx, "shake", "bad", "-1");
+  animateCard(idx, "shake", "bad", "+1");
   saveToCloud();
 });
 
 goodDeedBtn.addEventListener("click", () => {
   const idx = parseInt(playerSelect.value, 10);
-  players[idx].score += 1;
+  if (players[idx].score <= 0) return;
+  players[idx].score -= 1;
   const reaction = pickRandom(GOOD_DEED_REACTIONS);
   addHistory(players[idx].name, "deed", reaction);
   renderAll();
-  animateCard(idx, "glow", "good", "+1");
+  animateCard(idx, "glow", "good", "-1");
   saveToCloud();
 });
 
@@ -245,13 +251,16 @@ function renderScoreboard() {
     .sort((a, b) => b.score - a.score);
 
   playerCardsEl.innerHTML = sorted.map((p, rank) => {
-    const scoreClass = p.score < 0 ? "negative" : p.score > 0 ? "positive" : "zero";
-    const rankLabel = RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
-    const scoreDisplay = p.score > 0 ? "+" + p.score : p.score;
-    return '<div class="player-card" data-rank="' + (rank + 1) + '" data-idx="' + p.idx + '">'
+    const disqualified = p.score >= DISQUALIFY_AT;
+    const danger = p.score >= 7;
+    const scoreClass = disqualified ? "disqualified" : danger ? "danger" : p.score > 0 ? "warning" : "clean";
+    const rankLabel = disqualified ? "DISQUALIFIED" : RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
+    const cardClass = "player-card" + (disqualified ? " disqualified-card" : "");
+    return '<div class="' + cardClass + '" data-rank="' + (rank + 1) + '" data-idx="' + p.idx + '">'
       + '<span class="player-avatar">' + p.avatar + '</span>'
       + '<div class="player-name">' + p.name + '</div>'
-      + '<div class="player-score ' + scoreClass + '">' + scoreDisplay + '</div>'
+      + '<div class="player-score ' + scoreClass + '">' + p.score + ' / ' + DISQUALIFY_AT + '</div>'
+      + '<div class="score-bar"><div class="score-fill" style="width:' + (p.score / DISQUALIFY_AT * 100) + '%"></div></div>'
       + '<div class="player-rank">' + rankLabel + '</div>'
       + '</div>';
   }).join("");
