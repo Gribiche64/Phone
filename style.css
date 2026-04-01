@@ -90,16 +90,17 @@ header h1 {
 #player-cards {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: .6rem;
+  flex-wrap: nowrap;
 }
 
 .player-card {
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 20px;
-  padding: 1.5rem 1.2rem;
-  min-width: 160px;
-  box-shadow: 0 8px 24px var(--card-shadow);
+  border-radius: 16px;
+  padding: .8rem .6rem;
+  flex: 1;
+  max-width: 140px;
+  box-shadow: 0 4px 16px var(--card-shadow);
   transition: transform .3s, box-shadow .3s;
   text-align: center;
   position: relative;
@@ -120,19 +121,19 @@ header h1 {
 .player-card[data-rank="3"]::before { background: linear-gradient(90deg, var(--palm-green), #40916c); }
 
 .player-avatar {
-  font-size: 3rem;
-  margin-bottom: .5rem;
+  font-size: 2rem;
+  margin-bottom: .3rem;
   display: block;
 }
 .player-name {
-  font-size: 1.15rem;
+  font-size: .95rem;
   font-weight: 700;
   color: var(--text);
 }
 .player-score {
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   font-weight: 800;
-  margin: .4rem 0;
+  margin: .2rem 0;
   transition: all .3s;
 }
 .player-score.clean { color: var(--palm-green); }
@@ -403,7 +404,9 @@ footer {
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 600px) {
   header h1 { font-size: 2rem; }
-  .player-card { min-width: 130px; padding: 1rem .8rem; }
-  .player-score { font-size: 1.8rem; }
+  .player-avatar { font-size: 1.6rem; }
+  .player-name { font-size: .85rem; }
+  .player-score { font-size: 1.2rem; }
+  .player-rank { font-size: .65rem; }
   .action-btn { padding: .7rem 1.2rem; font-size: .95rem; }
 }

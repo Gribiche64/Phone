@@ -1,11 +1,11 @@
 /* ================================================================
    Florida Vacation Swear Chart
-   Interactive score tracker with shared cloud sync via jsonblob.com.
+   Interactive score tracker with shared cloud sync via npoint.io.
    Everyone with the same link sees the same scores in real time.
    ================================================================ */
 
 // ── Cloud Sync ─────────────────────────────────────────────────
-const BLOB_API = "https://jsonblob.com/api/jsonBlob";
+const NPOINT_API = "https://api.npoint.io";
 let blobId = null;
 let syncInterval = null;
 const SYNC_MS = 5000;
@@ -142,38 +142,24 @@ async function initSync() {
 }
 
 async function createBlob() {
-  const data = { players, history };
-  const res = await fetch(BLOB_API, {
+  const data = { players: players, history: history };
+  const res = await fetch(NPOINT_API, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
 
   if (!res.ok) throw new Error("Failed to create blob");
 
-  const location = res.headers.get("Location") || res.headers.get("location");
-  if (location) {
-    blobId = location.split("/").pop();
-  }
-
-  if (!blobId) {
-    const text = await res.text();
-    const match = text.match(/[a-f0-9]{24}/i);
-    if (match) blobId = match[0];
-  }
-
-  if (blobId) {
+  const result = await res.json();
+  if (result && result.id) {
+    blobId = result.id;
     window.history.replaceState(null, "", "?id=" + blobId);
   }
 }
 
 async function loadFromCloud() {
-  const res = await fetch(BLOB_API + "/" + blobId, {
-    headers: { "Accept": "application/json" },
-  });
+  const res = await fetch(NPOINT_API + "/" + blobId);
   if (!res.ok) return false;
   const data = await res.json();
   if (data && Array.isArray(data.players) && data.players.length > 0) {
@@ -189,13 +175,10 @@ async function saveToCloud() {
   if (!blobId) return;
   setSyncStatus("saving");
   try {
-    await fetch(BLOB_API + "/" + blobId, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify({ players, history }),
+    await fetch(NPOINT_API + "/" + blobId, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ players: players, history: history }),
     });
     setSyncStatus("synced");
   } catch (e) {
@@ -221,7 +204,8 @@ function startPolling() {
 
 function showShareLink() {
   if (!blobId || !shareBar) return;
-  const url = window.location.origin + window.location.pathname + "?id=" + blobId;
+  const base = window.location.origin + window.location.pathname;
+  const url = base + (base.indexOf("?") > -1 ? "&" : "?") + "id=" + blobId;
   shareLink.value = url;
   shareBar.classList.remove("hidden");
 }
