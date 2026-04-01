@@ -5,10 +5,89 @@
    ================================================================ */
 
 // ── Cloud Sync ─────────────────────────────────────────────────
-const NPOINT_API = "https://api.npoint.io";
+// Try multiple free JSON APIs. If all fail, works great locally.
+const JSON_APIS = [
+  {
+    name: "jsonblob",
+    create: function(data) {
+      return fetch("https://jsonblob.com/api/jsonBlob", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data),
+      }).then(function(res) {
+        if (!res.ok) throw new Error("fail");
+        var loc = res.headers.get("Location") || res.headers.get("location") || "";
+        return loc.split("/").pop();
+      });
+    },
+    read: function(id) {
+      return fetch("https://jsonblob.com/api/jsonBlob/" + id, {
+        headers: { "Accept": "application/json" },
+      }).then(function(res) { return res.ok ? res.json() : null; });
+    },
+    save: function(id, data) {
+      return fetch("https://jsonblob.com/api/jsonBlob/" + id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data),
+      });
+    },
+  },
+  {
+    name: "npoint",
+    create: function(data) {
+      return fetch("https://api.npoint.io", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(function(res) {
+        if (!res.ok) throw new Error("fail");
+        return res.json().then(function(r) { return r.id; });
+      });
+    },
+    read: function(id) {
+      return fetch("https://api.npoint.io/" + id)
+        .then(function(res) { return res.ok ? res.json() : null; });
+    },
+    save: function(id, data) {
+      return fetch("https://api.npoint.io/" + id, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    },
+  },
+  {
+    name: "extendsclass",
+    create: function(data) {
+      return fetch("https://json.extendsclass.com/bin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(function(res) {
+        if (!res.ok) throw new Error("fail");
+        return res.json().then(function(r) { return r.id; });
+      });
+    },
+    read: function(id) {
+      return fetch("https://json.extendsclass.com/bin/" + id)
+        .then(function(res) { return res.ok ? res.json() : null; });
+    },
+    save: function(id, data) {
+      return fetch("https://json.extendsclass.com/bin/" + id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    },
+  },
+];
+let activeApi = null;
 let blobId = null;
 let syncInterval = null;
 const SYNC_MS = 5000;
+const STORAGE_KEY = "florida-swear-chart";
+const HISTORY_KEY = "florida-swear-history";
 
 // ── Player Data ────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
@@ -47,9 +126,9 @@ const GOOD_DEED_REACTIONS = [
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
 
-// ── State ──────────────────────────────────────────────────────
-let players = DEFAULT_PLAYERS.map(p => ({ ...p }));
-let history = [];
+// ── State (load from localStorage first) ───────────────────────
+let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
+let history = loadLocal("history") || [];
 
 // ── DOM References ─────────────────────────────────────────────
 const playerCardsEl = document.getElementById("player-cards");
@@ -83,6 +162,7 @@ swearBtn.addEventListener("click", () => {
     ? "DISQUALIFIED! 10 strikes and you're OUT!"
     : pickRandom(SWEAR_REACTIONS);
   addHistory(players[idx].name, "swear", reaction);
+  saveLocal();
   renderAll();
   animateCard(idx, "shake", "bad", "+1");
   saveToCloud();
@@ -94,6 +174,7 @@ goodDeedBtn.addEventListener("click", () => {
   players[idx].score -= 1;
   const reaction = pickRandom(GOOD_DEED_REACTIONS);
   addHistory(players[idx].name, "deed", reaction);
+  saveLocal();
   renderAll();
   animateCard(idx, "glow", "good", "-1");
   saveToCloud();
@@ -112,74 +193,56 @@ copyBtn.addEventListener("click", () => {
 async function initSync() {
   setSyncStatus("connecting");
 
-  const params = new URLSearchParams(window.location.search);
+  var params = new URLSearchParams(window.location.search);
   blobId = params.get("id");
+  var apiName = params.get("api");
 
-  if (blobId) {
+  // If we have an existing session, try to reconnect
+  if (blobId && apiName) {
+    activeApi = JSON_APIS.find(function(a) { return a.name === apiName; });
+    if (activeApi) {
+      try {
+        var data = await activeApi.read(blobId);
+        if (data && Array.isArray(data.players) && data.players.length > 0) {
+          players = data.players;
+          if (Array.isArray(data.history)) history = data.history;
+          saveLocal();
+          renderAll();
+          showShareLink();
+          startPolling();
+          setSyncStatus("synced");
+          return;
+        }
+      } catch (e) { /* try creating new */ }
+    }
+  }
+
+  // Try each API until one works
+  var data = { players: players, history: history };
+  for (var i = 0; i < JSON_APIS.length; i++) {
     try {
-      const loaded = await loadFromCloud();
-      if (loaded) {
-        renderAll();
+      var api = JSON_APIS[i];
+      var id = await api.create(data);
+      if (id) {
+        activeApi = api;
+        blobId = id;
+        window.history.replaceState(null, "", "?api=" + api.name + "&id=" + blobId);
         showShareLink();
         startPolling();
         setSyncStatus("synced");
         return;
       }
-    } catch (e) {
-      /* blob ID invalid, create a new one */
-      blobId = null;
-    }
+    } catch (e) { /* try next */ }
   }
 
-  try {
-    await createBlob();
-    showShareLink();
-    startPolling();
-    setSyncStatus("synced");
-  } catch (e) {
-    setSyncStatus("offline");
-  }
-}
-
-async function createBlob() {
-  const data = { players: players, history: history };
-  const res = await fetch(NPOINT_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) throw new Error("Failed to create blob");
-
-  const result = await res.json();
-  if (result && result.id) {
-    blobId = result.id;
-    window.history.replaceState(null, "", "?id=" + blobId);
-  }
-}
-
-async function loadFromCloud() {
-  const res = await fetch(NPOINT_API + "/" + blobId);
-  if (!res.ok) return false;
-  const data = await res.json();
-  if (data && Array.isArray(data.players) && data.players.length > 0) {
-    players = data.players;
-  }
-  if (data && Array.isArray(data.history)) {
-    history = data.history;
-  }
-  return true;
+  setSyncStatus("offline");
 }
 
 async function saveToCloud() {
-  if (!blobId) return;
+  if (!activeApi || !blobId) return;
   setSyncStatus("saving");
   try {
-    await fetch(NPOINT_API + "/" + blobId, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ players: players, history: history }),
-    });
+    await activeApi.save(blobId, { players: players, history: history });
     setSyncStatus("synced");
   } catch (e) {
     setSyncStatus("offline");
@@ -188,11 +251,14 @@ async function saveToCloud() {
 
 function startPolling() {
   if (syncInterval) clearInterval(syncInterval);
-  syncInterval = setInterval(async () => {
-    if (!blobId) return;
+  syncInterval = setInterval(async function() {
+    if (!activeApi || !blobId) return;
     try {
-      const loaded = await loadFromCloud();
-      if (loaded) {
+      var data = await activeApi.read(blobId);
+      if (data && Array.isArray(data.players) && data.players.length > 0) {
+        players = data.players;
+        if (Array.isArray(data.history)) history = data.history;
+        saveLocal();
         renderAll();
         setSyncStatus("synced");
       }
@@ -203,9 +269,8 @@ function startPolling() {
 }
 
 function showShareLink() {
-  if (!blobId || !shareBar) return;
-  const base = window.location.origin + window.location.pathname;
-  const url = base + (base.indexOf("?") > -1 ? "&" : "?") + "id=" + blobId;
+  if (!blobId || !activeApi || !shareBar) return;
+  var url = window.location.origin + window.location.pathname + "?api=" + activeApi.name + "&id=" + blobId;
   shareLink.value = url;
   shareBar.classList.remove("hidden");
 }
@@ -293,6 +358,23 @@ function addHistory(name, type, reaction) {
   const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   history.push({ name: name, type: type, reaction: reaction, time: time });
   if (history.length > 50) history = history.slice(-50);
+}
+
+// ── Local Storage ──────────────────────────────────────────────
+function saveLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch (e) { /* storage full or unavailable */ }
+}
+
+function loadLocal(key) {
+  try {
+    var k = key === "players" ? STORAGE_KEY : HISTORY_KEY;
+    var raw = localStorage.getItem(k);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* corrupted */ }
+  return null;
 }
 
 // ── Utilities ──────────────────────────────────────────────────
