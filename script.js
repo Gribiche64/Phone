@@ -1,325 +1,294 @@
 /* ================================================================
-   Mystic Tarot — script.js
-   Full 78-card deck, spreads, flip animations, and readings.
+   Florida Vacation Swear Chart
+   Interactive score tracker with shared cloud sync via jsonblob.com.
+   Everyone with the same link sees the same scores in real time.
    ================================================================ */
 
-// ── Card Image Base URL ─────────────────────────────────────────
-// Rider-Waite-Smith public domain images via metabismuth/tarot-json
-const IMG_BASE = "https://raw.githubusercontent.com/metabismuth/tarot-json/master/cards/";
+// ── Cloud Sync ─────────────────────────────────────────────────
+const BLOB_API = "https://jsonblob.com/api/jsonBlob";
+let blobId = null;
+let syncInterval = null;
+const SYNC_MS = 5000;
 
-// ── Tarot Deck Data ─────────────────────────────────────────────
-
-const MAJOR_ARCANA = [
-  { name: "The Fool",            numeral: "0",    img: "m00.jpg", upright: "New beginnings, spontaneity, a free spirit", reversed: "Recklessness, holding back, fearfulness" },
-  { name: "The Magician",        numeral: "I",    img: "m01.jpg", upright: "Willpower, creation, manifestation", reversed: "Manipulation, trickery, untapped potential" },
-  { name: "The High Priestess",  numeral: "II",   img: "m02.jpg", upright: "Intuition, mystery, inner knowledge", reversed: "Secrets withheld, disconnection from intuition" },
-  { name: "The Empress",         numeral: "III",  img: "m03.jpg", upright: "Abundance, nurturing, fertility", reversed: "Dependence, smothering, creative block" },
-  { name: "The Emperor",         numeral: "IV",   img: "m04.jpg", upright: "Authority, structure, stability", reversed: "Tyranny, rigidity, loss of control" },
-  { name: "The Hierophant",      numeral: "V",    img: "m05.jpg", upright: "Tradition, guidance, conformity", reversed: "Rebellion, subversiveness, new approaches" },
-  { name: "The Lovers",          numeral: "VI",   img: "m06.jpg", upright: "Love, harmony, partnerships", reversed: "Disharmony, imbalance, misalignment" },
-  { name: "The Chariot",         numeral: "VII",  img: "m07.jpg", upright: "Determination, willpower, triumph", reversed: "Lack of direction, aggression, defeat" },
-  { name: "Strength",            numeral: "VIII", img: "m08.jpg", upright: "Courage, patience, inner strength", reversed: "Self-doubt, weakness, insecurity" },
-  { name: "The Hermit",          numeral: "IX",   img: "m09.jpg", upright: "Soul-searching, introspection, solitude", reversed: "Isolation, loneliness, withdrawal" },
-  { name: "Wheel of Fortune",    numeral: "X",    img: "m10.jpg", upright: "Change, cycles, destiny", reversed: "Bad luck, resistance to change, broken cycles" },
-  { name: "Justice",             numeral: "XI",   img: "m11.jpg", upright: "Fairness, truth, accountability", reversed: "Unfairness, dishonesty, lack of accountability" },
-  { name: "The Hanged Man",      numeral: "XII",  img: "m12.jpg", upright: "Surrender, new perspective, letting go", reversed: "Stalling, resistance, indecision" },
-  { name: "Death",               numeral: "XIII", img: "m13.jpg", upright: "Transformation, endings, transition", reversed: "Resistance to change, stagnation, fear" },
-  { name: "Temperance",          numeral: "XIV",  img: "m14.jpg", upright: "Balance, moderation, patience", reversed: "Excess, imbalance, lack of patience" },
-  { name: "The Devil",           numeral: "XV",   img: "m15.jpg", upright: "Shadow self, attachment, bondage", reversed: "Release, breaking free, reclaiming power" },
-  { name: "The Tower",           numeral: "XVI",  img: "m16.jpg", upright: "Upheaval, revelation, sudden change", reversed: "Avoidance of disaster, fear of change" },
-  { name: "The Star",            numeral: "XVII", img: "m17.jpg", upright: "Hope, inspiration, serenity", reversed: "Despair, discouragement, disconnection" },
-  { name: "The Moon",            numeral: "XVIII",img: "m18.jpg", upright: "Illusion, intuition, the subconscious", reversed: "Confusion, fear, misinterpretation" },
-  { name: "The Sun",             numeral: "XIX",  img: "m19.jpg", upright: "Joy, success, vitality", reversed: "Sadness, temporary setbacks, lack of clarity" },
-  { name: "Judgement",           numeral: "XX",   img: "m20.jpg", upright: "Reflection, reckoning, awakening", reversed: "Self-doubt, refusal of self-examination" },
-  { name: "The World",           numeral: "XXI",  img: "m21.jpg", upright: "Completion, accomplishment, wholeness", reversed: "Incompletion, shortcuts, emptiness" },
+// ── Player Data ────────────────────────────────────────────────
+const DEFAULT_PLAYERS = [
+  { name: "Meg",     avatar: "\u{1F334}", score: -2 },
+  { name: "Lincoln", avatar: "\u{1F9A9}", score: -2 },
+  { name: "Kailer",  avatar: "\u{1F40A}", score: -3 },
 ];
 
-const SUITS = [
-  {
-    name: "Wands", imgPrefix: "w", element: "Fire",
-    keywords: { upright: "creativity, passion, action", reversed: "delays, lack of energy, hesitation" }
-  },
-  {
-    name: "Cups", imgPrefix: "c", element: "Water",
-    keywords: { upright: "emotion, intuition, relationships", reversed: "emotional loss, blocked feelings, detachment" }
-  },
-  {
-    name: "Swords", imgPrefix: "s", element: "Air",
-    keywords: { upright: "intellect, truth, conflict", reversed: "confusion, harsh words, mental fog" }
-  },
-  {
-    name: "Pentacles", imgPrefix: "p", element: "Earth",
-    keywords: { upright: "material, career, finances", reversed: "financial loss, insecurity, poor planning" }
-  },
+const SWEAR_REACTIONS = [
+  "Ooh, language!",
+  "Soap, anyone?",
+  "The seagulls heard that!",
+  "Not in front of the dolphins!",
+  "That cost ya!",
+  "Grandma would NOT approve.",
+  "The palm trees are blushing.",
+  "Florida Man would be proud...",
+  "Drop it in the swear jar!",
+  "Watch your mouth, beach bum!",
 ];
 
-const COURT = ["Page", "Knight", "Queen", "King"];
-const PIPS = [
-  { rank: "Ace",   meaning_up: "new opportunity",   meaning_rev: "missed chance" },
-  { rank: "Two",   meaning_up: "decisions",          meaning_rev: "indecision" },
-  { rank: "Three", meaning_up: "growth",             meaning_rev: "setbacks" },
-  { rank: "Four",  meaning_up: "stability",          meaning_rev: "restlessness" },
-  { rank: "Five",  meaning_up: "challenge",          meaning_rev: "recovery" },
-  { rank: "Six",   meaning_up: "harmony",            meaning_rev: "disharmony" },
-  { rank: "Seven", meaning_up: "reflection",         meaning_rev: "confusion" },
-  { rank: "Eight", meaning_up: "movement",           meaning_rev: "stagnation" },
-  { rank: "Nine",  meaning_up: "fulfillment",        meaning_rev: "disappointment" },
-  { rank: "Ten",   meaning_up: "completion",         meaning_rev: "burden" },
+const GOOD_DEED_REACTIONS = [
+  "Aww, how sweet!",
+  "Redemption arc!",
+  "Faith in humanity restored.",
+  "A true Florida angel.",
+  "Gold star for you!",
+  "That's the spirit!",
+  "Making grandma proud!",
+  "Wholesome beach vibes!",
+  "You've earned some sunscreen karma.",
+  "The manatees approve!",
 ];
 
-const COURT_MEANINGS = {
-  Page:   { meaning_up: "curiosity and new messages",   meaning_rev: "immaturity and bad news" },
-  Knight: { meaning_up: "action and adventure",         meaning_rev: "recklessness and haste" },
-  Queen:  { meaning_up: "nurturing and mastery",        meaning_rev: "insecurity and smothering" },
-  King:   { meaning_up: "leadership and authority",     meaning_rev: "domineering and rigidity" },
-};
+const RANK_LABELS = ["Cleanest Mouth", "Middle of the Road", "Potty Mouth Champion"];
 
-// Minor Arcana court card image numbers: Page=11, Knight=12, Queen=13, King=14
-const COURT_IMG_NUM = { Page: 11, Knight: 12, Queen: 13, King: 14 };
+// ── State ──────────────────────────────────────────────────────
+let players = DEFAULT_PLAYERS.map(p => ({ ...p }));
+let history = [];
 
-function buildDeck() {
-  const deck = MAJOR_ARCANA.map(c => ({
-    ...c,
-    type: "major",
-    suit: null,
-  }));
+// ── DOM References ─────────────────────────────────────────────
+const playerCardsEl = document.getElementById("player-cards");
+const playerSelect = document.getElementById("player-select");
+const swearBtn = document.getElementById("swear-btn");
+const goodDeedBtn = document.getElementById("good-deed-btn");
+const historyLog = document.getElementById("history-log");
+const bubblesEl = document.getElementById("bubbles");
+const shareBar = document.getElementById("share-bar");
+const shareLink = document.getElementById("share-link");
+const copyBtn = document.getElementById("copy-btn");
+const syncStatus = document.getElementById("sync-status");
 
-  for (const suit of SUITS) {
-    for (let i = 0; i < PIPS.length; i++) {
-      const pip = PIPS[i];
-      const num = String(i + 1).padStart(2, "0");
-      deck.push({
-        name: `${pip.rank} of ${suit.name}`,
-        numeral: `${suit.name}`,
-        img: `${suit.imgPrefix}${num}.jpg`,
-        upright: `${pip.meaning_up} in ${suit.keywords.upright}`,
-        reversed: `${pip.meaning_rev} in ${suit.keywords.reversed}`,
-        type: "minor",
-        suit: suit.name,
-      });
-    }
-    for (const rank of COURT) {
-      const cm = COURT_MEANINGS[rank];
-      const num = String(COURT_IMG_NUM[rank]).padStart(2, "0");
-      deck.push({
-        name: `${rank} of ${suit.name}`,
-        numeral: `${suit.name}`,
-        img: `${suit.imgPrefix}${num}.jpg`,
-        upright: `${cm.meaning_up} in ${suit.keywords.upright}`,
-        reversed: `${cm.meaning_rev} in ${suit.keywords.reversed}`,
-        type: "minor",
-        suit: suit.name,
-      });
-    }
-  }
-  return deck;
-}
+// ── Initialize ─────────────────────────────────────────────────
+createBubbles();
+renderAll();
+initSync();
 
-const FULL_DECK = buildDeck();
+// ── Event Listeners ────────────────────────────────────────────
+swearBtn.addEventListener("click", () => {
+  const idx = parseInt(playerSelect.value, 10);
+  players[idx].score -= 1;
+  const reaction = pickRandom(SWEAR_REACTIONS);
+  addHistory(players[idx].name, "swear", reaction);
+  renderAll();
+  animateCard(idx, "shake", "bad", "-1");
+  saveToCloud();
+});
 
-// ── Spread Definitions ──────────────────────────────────────────
+goodDeedBtn.addEventListener("click", () => {
+  const idx = parseInt(playerSelect.value, 10);
+  players[idx].score += 1;
+  const reaction = pickRandom(GOOD_DEED_REACTIONS);
+  addHistory(players[idx].name, "deed", reaction);
+  renderAll();
+  animateCard(idx, "glow", "good", "+1");
+  saveToCloud();
+});
 
-const SPREADS = {
-  single: {
-    count: 1,
-    positions: ["Your Card"],
-  },
-  three: {
-    count: 3,
-    positions: ["Past", "Present", "Future"],
-  },
-  five: {
-    count: 5,
-    positions: ["Present", "Challenge", "Past", "Future", "Potential"],
-  },
-};
-
-// ── State ───────────────────────────────────────────────────────
-
-let currentSpread = "single";
-let drawnCards = [];
-let revealedCount = 0;
-
-// ── DOM refs ────────────────────────────────────────────────────
-
-const spreadBtns     = document.querySelectorAll(".spread-btn");
-const drawBtn        = document.getElementById("draw-btn");
-const resetBtn       = document.getElementById("reset-btn");
-const readingArea    = document.getElementById("reading-area");
-const cardSpread     = document.getElementById("card-spread");
-const readingSummary = document.getElementById("reading-summary");
-const summaryText    = document.getElementById("summary-text");
-const spreadPicker   = document.getElementById("spread-picker");
-const questionSection= document.getElementById("question-section");
-
-// ── Stars background ────────────────────────────────────────────
-
-(function generateStars() {
-  const container = document.getElementById("stars");
-  for (let i = 0; i < 90; i++) {
-    const star = document.createElement("div");
-    star.className = "star";
-    star.style.left = Math.random() * 100 + "%";
-    star.style.top  = Math.random() * 100 + "%";
-    star.style.setProperty("--dur", (1.5 + Math.random() * 3) + "s");
-    star.style.animationDelay = (Math.random() * 3) + "s";
-    container.appendChild(star);
-  }
-})();
-
-// ── Spread selection ────────────────────────────────────────────
-
-spreadBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    spreadBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentSpread = btn.dataset.spread;
+copyBtn.addEventListener("click", () => {
+  navigator.clipboard.writeText(shareLink.value).then(() => {
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000);
   });
 });
 
-// ── Draw cards ──────────────────────────────────────────────────
+// ── Cloud Sync ─────────────────────────────────────────────────
+async function initSync() {
+  setSyncStatus("connecting");
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  const params = new URLSearchParams(window.location.search);
+  blobId = params.get("id");
+
+  if (blobId) {
+    const loaded = await loadFromCloud();
+    if (loaded) {
+      renderAll();
+      showShareLink();
+      startPolling();
+      setSyncStatus("synced");
+      return;
+    }
   }
-  return a;
+
+  await createBlob();
+  showShareLink();
+  startPolling();
+  setSyncStatus("synced");
 }
 
-function drawReading() {
-  const spread = SPREADS[currentSpread];
-  const shuffled = shuffle(FULL_DECK);
-  drawnCards = shuffled.slice(0, spread.count).map(card => ({
-    ...card,
-    isReversed: Math.random() < 0.3,
-  }));
-  revealedCount = 0;
-
-  spreadPicker.classList.add("hidden");
-  questionSection.classList.add("hidden");
-  readingArea.classList.remove("hidden");
-  readingSummary.classList.add("hidden");
-  resetBtn.classList.add("hidden");
-
-  cardSpread.innerHTML = "";
-
-  drawnCards.forEach((card, i) => {
-    const slot = document.createElement("div");
-    slot.className = "card-slot";
-
-    const posLabel = document.createElement("div");
-    posLabel.className = "card-position-label";
-    posLabel.textContent = spread.positions[i];
-    slot.appendChild(posLabel);
-
-    const cardEl = document.createElement("div");
-    cardEl.className = "tarot-card" + (card.isReversed ? " reversed" : "");
-    cardEl.dataset.index = i;
-    cardEl.innerHTML = `
-      <div class="card-face card-back">
-        <div class="card-back-design"></div>
-      </div>
-      <div class="card-face card-front">
-        <div class="card-numeral">${card.numeral}</div>
-        <div class="card-art"><img src="${IMG_BASE}${card.img}" alt="${card.name}" draggable="false"></div>
-        <div class="card-name">${card.name}</div>
-        <div class="card-upright-reversed">${card.isReversed ? "Reversed" : "Upright"}</div>
-      </div>
-    `;
-
-    cardEl.addEventListener("click", () => revealCard(cardEl, i));
-    slot.appendChild(cardEl);
-
-    const meaning = document.createElement("div");
-    meaning.className = "card-meaning";
-    meaning.id = "meaning-" + i;
-    meaning.innerHTML = `
-      <span class="meaning-label">${card.isReversed ? "Reversed" : "Upright"}</span>
-      <p>${card.isReversed ? card.reversed : card.upright}</p>
-    `;
-    slot.appendChild(meaning);
-
-    cardSpread.appendChild(slot);
-  });
-}
-
-function revealCard(cardEl, index) {
-  if (cardEl.classList.contains("flipped")) return;
-  cardEl.classList.add("flipped");
-  revealedCount++;
-
-  setTimeout(() => {
-    const meaningEl = document.getElementById("meaning-" + index);
-    if (meaningEl) meaningEl.classList.add("show");
-  }, 500);
-
-  if (revealedCount === drawnCards.length) {
-    setTimeout(showSummary, 900);
+async function createBlob() {
+  try {
+    const data = { players, history };
+    const res = await fetch(BLOB_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const location = res.headers.get("Location") || res.headers.get("location");
+    if (location) {
+      blobId = location.split("/").pop();
+    } else {
+      const url = res.url || "";
+      blobId = url.split("/").pop();
+    }
+    if (blobId) {
+      window.history.replaceState(null, "", `?id=${blobId}`);
+    }
+  } catch (e) {
+    setSyncStatus("offline");
   }
 }
 
-// ── Summary ─────────────────────────────────────────────────────
-
-function showSummary() {
-  const spread = SPREADS[currentSpread];
-  const lines = drawnCards.map((card, i) => {
-    const orient = card.isReversed ? "reversed" : "upright";
-    const meaning = card.isReversed ? card.reversed : card.upright;
-    return `<strong>${spread.positions[i]}:</strong> ${card.name} (${orient}) &mdash; ${meaning}.`;
-  });
-
-  const overall = generateOverallMessage();
-  summaryText.innerHTML = lines.join("<br><br>") + "<br><br><em>" + overall + "</em>";
-  readingSummary.classList.remove("hidden");
-  resetBtn.classList.remove("hidden");
+async function loadFromCloud() {
+  try {
+    const res = await fetch(`${BLOB_API}/${blobId}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (data.players) players = data.players;
+    if (data.history) history = data.history;
+    return true;
+  } catch (e) {
+    setSyncStatus("offline");
+    return false;
+  }
 }
 
-function generateOverallMessage() {
-  const majorCount = drawnCards.filter(c => c.type === "major").length;
-  const reversedCount = drawnCards.filter(c => c.isReversed).length;
-  const suits = drawnCards.filter(c => c.suit).map(c => c.suit);
-
-  const messages = [];
-
-  if (majorCount > drawnCards.length / 2) {
-    messages.push("The prevalence of Major Arcana cards suggests powerful forces at work in your life — pay attention to the larger themes unfolding.");
+async function saveToCloud() {
+  if (!blobId) return;
+  setSyncStatus("saving");
+  try {
+    await fetch(`${BLOB_API}/${blobId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ players, history }),
+    });
+    setSyncStatus("synced");
+  } catch (e) {
+    setSyncStatus("offline");
   }
-  if (reversedCount > drawnCards.length / 2) {
-    messages.push("Many reversed cards indicate inner work is needed. Look inward before taking outward action.");
-  } else if (reversedCount === 0) {
-    messages.push("All cards appear upright, signaling clarity and forward momentum in your path.");
-  }
-
-  const suitSet = new Set(suits);
-  if (suitSet.size === 1 && suits.length > 1) {
-    const dominant = suits[0];
-    const element = SUITS.find(s => s.name === dominant)?.element;
-    messages.push(`The dominance of ${dominant} (${element}) points to themes of ${SUITS.find(s => s.name === dominant)?.keywords.upright}.`);
-  }
-
-  if (messages.length === 0) {
-    messages.push("The cards reveal a balanced mixture of energies. Stay open to the guidance each card offers and trust your intuition.");
-  }
-
-  return messages.join(" ");
 }
 
-// ── Reset ───────────────────────────────────────────────────────
-
-function resetReading() {
-  readingArea.classList.add("hidden");
-  spreadPicker.classList.remove("hidden");
-  questionSection.classList.remove("hidden");
-  readingSummary.classList.add("hidden");
-  resetBtn.classList.add("hidden");
-  cardSpread.innerHTML = "";
-  drawnCards = [];
-  revealedCount = 0;
+function startPolling() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(async () => {
+    if (!blobId) return;
+    const loaded = await loadFromCloud();
+    if (loaded) {
+      renderAll();
+      setSyncStatus("synced");
+    }
+  }, SYNC_MS);
 }
 
-// ── Event Listeners ─────────────────────────────────────────────
+function showShareLink() {
+  if (!blobId) return;
+  const url = `${window.location.origin}${window.location.pathname}?id=${blobId}`;
+  shareLink.value = url;
+  shareBar.classList.remove("hidden");
+}
 
-drawBtn.addEventListener("click", drawReading);
-resetBtn.addEventListener("click", resetReading);
+function setSyncStatus(state) {
+  if (!syncStatus) return;
+  const labels = {
+    connecting: "\u{1F504} Connecting...",
+    synced:     "\u{2601}\uFE0F Synced",
+    saving:     "\u{1F4BE} Saving...",
+    offline:    "\u{1F4F4} Offline (local only)",
+  };
+  syncStatus.textContent = labels[state] || "";
+  syncStatus.className = `sync-status ${state}`;
+}
+
+// ── Rendering ──────────────────────────────────────────────────
+function renderAll() {
+  renderScoreboard();
+  renderSelect();
+  renderHistory();
+}
+
+function renderScoreboard() {
+  const sorted = players
+    .map((p, i) => ({ ...p, idx: i }))
+    .sort((a, b) => b.score - a.score);
+
+  playerCardsEl.innerHTML = sorted.map((p, rank) => {
+    const scoreClass = p.score < 0 ? "negative" : p.score > 0 ? "positive" : "zero";
+    const rankLabel = RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
+    const scoreDisplay = p.score > 0 ? `+${p.score}` : p.score;
+    return `
+      <div class="player-card" data-rank="${rank + 1}" data-idx="${p.idx}">
+        <span class="player-avatar">${p.avatar}</span>
+        <div class="player-name">${p.name}</div>
+        <div class="player-score ${scoreClass}">${scoreDisplay}</div>
+        <div class="player-rank">${rankLabel}</div>
+      </div>`;
+  }).join("");
+}
+
+function renderSelect() {
+  const currentVal = playerSelect.value;
+  playerSelect.innerHTML = players
+    .map((p, i) => `<option value="${i}">${p.avatar} ${p.name}</option>`)
+    .join("");
+  if (currentVal !== "" && currentVal < players.length) {
+    playerSelect.value = currentVal;
+  }
+}
+
+function renderHistory() {
+  const recent = history.slice(-15).reverse();
+  historyLog.innerHTML = recent.map(entry => {
+    const cls = entry.type === "swear" ? "swear-entry" : "deed-entry";
+    const icon = entry.type === "swear" ? "\u{1F92C}" : "\u{1F607}";
+    return `
+      <li class="${cls}">
+        <span class="log-text">${icon} <strong>${entry.name}</strong> \u2014 ${entry.reaction}</span>
+        <span class="log-time">${entry.time}</span>
+      </li>`;
+  }).join("");
+}
+
+// ── Animations ─────────────────────────────────────────────────
+function animateCard(playerIdx, animClass, changeType, changeText) {
+  const card = playerCardsEl.querySelector(`[data-idx="${playerIdx}"]`);
+  if (!card) return;
+
+  card.classList.add(animClass);
+  setTimeout(() => card.classList.remove(animClass), 600);
+
+  const pop = document.createElement("div");
+  pop.className = `score-change ${changeType}`;
+  pop.textContent = changeText;
+  card.appendChild(pop);
+  setTimeout(() => pop.remove(), 800);
+}
+
+// ── History Management ─────────────────────────────────────────
+function addHistory(name, type, reaction) {
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  history.push({ name, type, reaction, time });
+  if (history.length > 50) history = history.slice(-50);
+}
+
+// ── Utilities ──────────────────────────────────────────────────
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function createBubbles() {
+  for (let i = 0; i < 20; i++) {
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    const size = Math.random() * 40 + 10;
+    bubble.style.width = size + "px";
+    bubble.style.height = size + "px";
+    bubble.style.left = Math.random() * 100 + "%";
+    bubble.style.top = Math.random() * 100 + "%";
+    bubble.style.setProperty("--dur", (Math.random() * 6 + 4) + "s");
+    bubble.style.animationDelay = Math.random() * 5 + "s";
+    bubblesEl.appendChild(bubble);
+  }
+}

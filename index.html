@@ -3,59 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mystic Tarot</title>
+  <title>Florida Vacation Swear Chart</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="stars"></div>
+  <div id="bubbles"></div>
 
   <header>
-    <h1>Mystic Tarot</h1>
-    <p class="subtitle">Unveil the wisdom of the cards</p>
+    <h1>Swear Jar</h1>
+    <p class="subtitle">Florida Vacation Edition</p>
+    <div id="sync-status" class="sync-status connecting"></div>
   </header>
 
+  <section id="share-bar" class="hidden">
+    <label>Share this link so everyone sees the same scores:</label>
+    <div class="share-row">
+      <input type="text" id="share-link" readonly>
+      <button id="copy-btn">Copy</button>
+    </div>
+  </section>
+
   <main>
-    <section id="spread-picker">
-      <h2>Choose Your Spread</h2>
-      <div class="spread-options">
-        <button class="spread-btn active" data-spread="single">
-          <span class="spread-icon">&#9734;</span>
-          <span class="spread-label">Single Card</span>
-          <span class="spread-desc">Quick daily insight</span>
+    <section id="scoreboard">
+      <h2>The Standings</h2>
+      <div id="player-cards"></div>
+    </section>
+
+    <section id="controls">
+      <h2>Update Scores</h2>
+      <div class="control-row">
+        <label for="player-select">Who?</label>
+        <select id="player-select"></select>
+      </div>
+      <div class="action-buttons">
+        <button id="swear-btn" class="action-btn swear">
+          <span class="btn-icon">🤬</span>
+          <span>Swear! (-1)</span>
         </button>
-        <button class="spread-btn" data-spread="three">
-          <span class="spread-icon">&#9789; &#9788; &#9790;</span>
-          <span class="spread-label">Three Cards</span>
-          <span class="spread-desc">Past &middot; Present &middot; Future</span>
-        </button>
-        <button class="spread-btn" data-spread="five">
-          <span class="spread-icon">&#10017;</span>
-          <span class="spread-label">Five Cards</span>
-          <span class="spread-desc">Cross of Truth</span>
+        <button id="good-deed-btn" class="action-btn good-deed">
+          <span class="btn-icon">😇</span>
+          <span>Good Deed (+1)</span>
         </button>
       </div>
     </section>
 
-    <section id="question-section">
-      <label for="question-input">Focus on a question or leave blank for general guidance</label>
-      <div class="question-row">
-        <input type="text" id="question-input" placeholder="What does the universe want me to know?">
-        <button id="draw-btn">Draw Cards</button>
-      </div>
-    </section>
-
-    <section id="reading-area" class="hidden">
-      <div id="card-spread"></div>
-      <div id="reading-summary" class="hidden">
-        <h2>Your Reading</h2>
-        <p id="summary-text"></p>
-      </div>
-      <button id="reset-btn" class="hidden">New Reading</button>
+    <section id="history-section">
+      <h2>Recent Activity</h2>
+      <ul id="history-log"></ul>
     </section>
   </main>
 
   <footer>
-    <p>Mystic Tarot &mdash; for entertainment and reflection</p>
+    <p>Florida Vacation 2026 &mdash; Keep it clean(ish)!</p>
   </footer>
 
   <script src="script.js"></script>
