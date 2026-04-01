@@ -12,9 +12,9 @@ const SYNC_MS = 5000;
 
 // ── Player Data ────────────────────────────────────────────────
 const DEFAULT_PLAYERS = [
-  { name: "Meg",     avatar: "\u{1F334}", score: -2 },
-  { name: "Lincoln", avatar: "\u{1F9A9}", score: -2 },
-  { name: "Kailer",  avatar: "\u{1F40A}", score: -3 },
+  { name: "Meg",     avatar: "🌴", score: -2 },
+  { name: "Lincoln", avatar: "🦩", score: -2 },
+  { name: "Kailer",  avatar: "🐊", score: -3 },
 ];
 
 const SWEAR_REACTIONS = [
@@ -62,9 +62,15 @@ const copyBtn = document.getElementById("copy-btn");
 const syncStatus = document.getElementById("sync-status");
 
 // ── Initialize ─────────────────────────────────────────────────
-createBubbles();
+try {
+  createBubbles();
+} catch (e) { /* bubbles are decorative, don't block */ }
+
 renderAll();
-initSync();
+
+initSync().catch(() => {
+  setSyncStatus("offline");
+});
 
 // ── Event Listeners ────────────────────────────────────────────
 swearBtn.addEventListener("click", () => {
@@ -91,6 +97,8 @@ copyBtn.addEventListener("click", () => {
   navigator.clipboard.writeText(shareLink.value).then(() => {
     copyBtn.textContent = "Copied!";
     setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000);
+  }).catch(() => {
+    shareLink.select();
   });
 });
 
@@ -102,66 +110,85 @@ async function initSync() {
   blobId = params.get("id");
 
   if (blobId) {
-    const loaded = await loadFromCloud();
-    if (loaded) {
-      renderAll();
-      showShareLink();
-      startPolling();
-      setSyncStatus("synced");
-      return;
+    try {
+      const loaded = await loadFromCloud();
+      if (loaded) {
+        renderAll();
+        showShareLink();
+        startPolling();
+        setSyncStatus("synced");
+        return;
+      }
+    } catch (e) {
+      /* blob ID invalid, create a new one */
+      blobId = null;
     }
   }
 
-  await createBlob();
-  showShareLink();
-  startPolling();
-  setSyncStatus("synced");
+  try {
+    await createBlob();
+    showShareLink();
+    startPolling();
+    setSyncStatus("synced");
+  } catch (e) {
+    setSyncStatus("offline");
+  }
 }
 
 async function createBlob() {
-  try {
-    const data = { players, history };
-    const res = await fetch(BLOB_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const location = res.headers.get("Location") || res.headers.get("location");
-    if (location) {
-      blobId = location.split("/").pop();
-    } else {
-      const url = res.url || "";
-      blobId = url.split("/").pop();
-    }
-    if (blobId) {
-      window.history.replaceState(null, "", `?id=${blobId}`);
-    }
-  } catch (e) {
-    setSyncStatus("offline");
+  const data = { players, history };
+  const res = await fetch(BLOB_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to create blob");
+
+  const location = res.headers.get("Location") || res.headers.get("location");
+  if (location) {
+    blobId = location.split("/").pop();
+  }
+
+  if (!blobId) {
+    const text = await res.text();
+    const match = text.match(/[a-f0-9]{24}/i);
+    if (match) blobId = match[0];
+  }
+
+  if (blobId) {
+    window.history.replaceState(null, "", "?id=" + blobId);
   }
 }
 
 async function loadFromCloud() {
-  try {
-    const res = await fetch(`${BLOB_API}/${blobId}`);
-    if (!res.ok) return false;
-    const data = await res.json();
-    if (data.players) players = data.players;
-    if (data.history) history = data.history;
-    return true;
-  } catch (e) {
-    setSyncStatus("offline");
-    return false;
+  const res = await fetch(BLOB_API + "/" + blobId, {
+    headers: { "Accept": "application/json" },
+  });
+  if (!res.ok) return false;
+  const data = await res.json();
+  if (data && Array.isArray(data.players) && data.players.length > 0) {
+    players = data.players;
   }
+  if (data && Array.isArray(data.history)) {
+    history = data.history;
+  }
+  return true;
 }
 
 async function saveToCloud() {
   if (!blobId) return;
   setSyncStatus("saving");
   try {
-    await fetch(`${BLOB_API}/${blobId}`, {
+    await fetch(BLOB_API + "/" + blobId, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
       body: JSON.stringify({ players, history }),
     });
     setSyncStatus("synced");
@@ -174,17 +201,21 @@ function startPolling() {
   if (syncInterval) clearInterval(syncInterval);
   syncInterval = setInterval(async () => {
     if (!blobId) return;
-    const loaded = await loadFromCloud();
-    if (loaded) {
-      renderAll();
-      setSyncStatus("synced");
+    try {
+      const loaded = await loadFromCloud();
+      if (loaded) {
+        renderAll();
+        setSyncStatus("synced");
+      }
+    } catch (e) {
+      setSyncStatus("offline");
     }
   }, SYNC_MS);
 }
 
 function showShareLink() {
-  if (!blobId) return;
-  const url = `${window.location.origin}${window.location.pathname}?id=${blobId}`;
+  if (!blobId || !shareBar) return;
+  const url = window.location.origin + window.location.pathname + "?id=" + blobId;
   shareLink.value = url;
   shareBar.classList.remove("hidden");
 }
@@ -192,13 +223,13 @@ function showShareLink() {
 function setSyncStatus(state) {
   if (!syncStatus) return;
   const labels = {
-    connecting: "\u{1F504} Connecting...",
-    synced:     "\u{2601}\uFE0F Synced",
-    saving:     "\u{1F4BE} Saving...",
-    offline:    "\u{1F4F4} Offline (local only)",
+    connecting: "🔄 Connecting...",
+    synced:     "☁️ Synced",
+    saving:     "💾 Saving...",
+    offline:    "📴 Offline (local only)",
   };
   syncStatus.textContent = labels[state] || "";
-  syncStatus.className = `sync-status ${state}`;
+  syncStatus.className = "sync-status " + state;
 }
 
 // ── Rendering ──────────────────────────────────────────────────
@@ -216,21 +247,20 @@ function renderScoreboard() {
   playerCardsEl.innerHTML = sorted.map((p, rank) => {
     const scoreClass = p.score < 0 ? "negative" : p.score > 0 ? "positive" : "zero";
     const rankLabel = RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
-    const scoreDisplay = p.score > 0 ? `+${p.score}` : p.score;
-    return `
-      <div class="player-card" data-rank="${rank + 1}" data-idx="${p.idx}">
-        <span class="player-avatar">${p.avatar}</span>
-        <div class="player-name">${p.name}</div>
-        <div class="player-score ${scoreClass}">${scoreDisplay}</div>
-        <div class="player-rank">${rankLabel}</div>
-      </div>`;
+    const scoreDisplay = p.score > 0 ? "+" + p.score : p.score;
+    return '<div class="player-card" data-rank="' + (rank + 1) + '" data-idx="' + p.idx + '">'
+      + '<span class="player-avatar">' + p.avatar + '</span>'
+      + '<div class="player-name">' + p.name + '</div>'
+      + '<div class="player-score ' + scoreClass + '">' + scoreDisplay + '</div>'
+      + '<div class="player-rank">' + rankLabel + '</div>'
+      + '</div>';
   }).join("");
 }
 
 function renderSelect() {
   const currentVal = playerSelect.value;
   playerSelect.innerHTML = players
-    .map((p, i) => `<option value="${i}">${p.avatar} ${p.name}</option>`)
+    .map((p, i) => '<option value="' + i + '">' + p.avatar + ' ' + p.name + '</option>')
     .join("");
   if (currentVal !== "" && currentVal < players.length) {
     playerSelect.value = currentVal;
@@ -241,35 +271,34 @@ function renderHistory() {
   const recent = history.slice(-15).reverse();
   historyLog.innerHTML = recent.map(entry => {
     const cls = entry.type === "swear" ? "swear-entry" : "deed-entry";
-    const icon = entry.type === "swear" ? "\u{1F92C}" : "\u{1F607}";
-    return `
-      <li class="${cls}">
-        <span class="log-text">${icon} <strong>${entry.name}</strong> \u2014 ${entry.reaction}</span>
-        <span class="log-time">${entry.time}</span>
-      </li>`;
+    const icon = entry.type === "swear" ? "🤬" : "😇";
+    return '<li class="' + cls + '">'
+      + '<span class="log-text">' + icon + ' <strong>' + entry.name + '</strong> — ' + entry.reaction + '</span>'
+      + '<span class="log-time">' + entry.time + '</span>'
+      + '</li>';
   }).join("");
 }
 
 // ── Animations ─────────────────────────────────────────────────
 function animateCard(playerIdx, animClass, changeType, changeText) {
-  const card = playerCardsEl.querySelector(`[data-idx="${playerIdx}"]`);
+  const card = playerCardsEl.querySelector('[data-idx="' + playerIdx + '"]');
   if (!card) return;
 
   card.classList.add(animClass);
-  setTimeout(() => card.classList.remove(animClass), 600);
+  setTimeout(function() { card.classList.remove(animClass); }, 600);
 
   const pop = document.createElement("div");
-  pop.className = `score-change ${changeType}`;
+  pop.className = "score-change " + changeType;
   pop.textContent = changeText;
   card.appendChild(pop);
-  setTimeout(() => pop.remove(), 800);
+  setTimeout(function() { pop.remove(); }, 800);
 }
 
 // ── History Management ─────────────────────────────────────────
 function addHistory(name, type, reaction) {
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  history.push({ name, type, reaction, time });
+  history.push({ name: name, type: type, reaction: reaction, time: time });
   if (history.length > 50) history = history.slice(-50);
 }
 
