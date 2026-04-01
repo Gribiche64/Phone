@@ -12,7 +12,16 @@
   <header>
     <h1>Swear Jar</h1>
     <p class="subtitle">Florida Vacation Edition</p>
+    <div id="sync-status" class="sync-status connecting"></div>
   </header>
+
+  <section id="share-bar" class="hidden">
+    <label>Share this link so everyone sees the same scores:</label>
+    <div class="share-row">
+      <input type="text" id="share-link" readonly>
+      <button id="copy-btn">Copy</button>
+    </div>
+  </section>
 
   <main>
     <section id="scoreboard">

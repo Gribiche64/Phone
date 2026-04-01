@@ -1,17 +1,20 @@
 /* ================================================================
    Florida Vacation Swear Chart
-   Interactive score tracker — swear words lose points, good deeds earn them back.
-   Scores persist in localStorage.
+   Interactive score tracker with shared cloud sync via jsonblob.com.
+   Everyone with the same link sees the same scores in real time.
    ================================================================ */
 
-// ── Player Data ────────────────────────────────────────────────
-const STORAGE_KEY = "florida-swear-chart";
-const HISTORY_KEY = "florida-swear-history";
+// ── Cloud Sync ─────────────────────────────────────────────────
+const BLOB_API = "https://jsonblob.com/api/jsonBlob";
+let blobId = null;
+let syncInterval = null;
+const SYNC_MS = 5000;
 
+// ── Player Data ────────────────────────────────────────────────
 const DEFAULT_PLAYERS = [
-  { name: "Meg",     avatar: "🌴", score: -2 },
-  { name: "Lincoln", avatar: "🦩", score: -2 },
-  { name: "Kailer",  avatar: "🐊", score: -3 },
+  { name: "Meg",     avatar: "\u{1F334}", score: -2 },
+  { name: "Lincoln", avatar: "\u{1F9A9}", score: -2 },
+  { name: "Kailer",  avatar: "\u{1F40A}", score: -3 },
 ];
 
 const SWEAR_REACTIONS = [
@@ -43,8 +46,8 @@ const GOOD_DEED_REACTIONS = [
 const RANK_LABELS = ["Cleanest Mouth", "Middle of the Road", "Potty Mouth Champion"];
 
 // ── State ──────────────────────────────────────────────────────
-let players = loadPlayers();
-let history = loadHistory();
+let players = DEFAULT_PLAYERS.map(p => ({ ...p }));
+let history = [];
 
 // ── DOM References ─────────────────────────────────────────────
 const playerCardsEl = document.getElementById("player-cards");
@@ -53,10 +56,15 @@ const swearBtn = document.getElementById("swear-btn");
 const goodDeedBtn = document.getElementById("good-deed-btn");
 const historyLog = document.getElementById("history-log");
 const bubblesEl = document.getElementById("bubbles");
+const shareBar = document.getElementById("share-bar");
+const shareLink = document.getElementById("share-link");
+const copyBtn = document.getElementById("copy-btn");
+const syncStatus = document.getElementById("sync-status");
 
 // ── Initialize ─────────────────────────────────────────────────
 createBubbles();
 renderAll();
+initSync();
 
 // ── Event Listeners ────────────────────────────────────────────
 swearBtn.addEventListener("click", () => {
@@ -64,10 +72,9 @@ swearBtn.addEventListener("click", () => {
   players[idx].score -= 1;
   const reaction = pickRandom(SWEAR_REACTIONS);
   addHistory(players[idx].name, "swear", reaction);
-  savePlayers();
-  saveHistory();
   renderAll();
   animateCard(idx, "shake", "bad", "-1");
+  saveToCloud();
 });
 
 goodDeedBtn.addEventListener("click", () => {
@@ -75,11 +82,124 @@ goodDeedBtn.addEventListener("click", () => {
   players[idx].score += 1;
   const reaction = pickRandom(GOOD_DEED_REACTIONS);
   addHistory(players[idx].name, "deed", reaction);
-  savePlayers();
-  saveHistory();
   renderAll();
   animateCard(idx, "glow", "good", "+1");
+  saveToCloud();
 });
+
+copyBtn.addEventListener("click", () => {
+  navigator.clipboard.writeText(shareLink.value).then(() => {
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000);
+  });
+});
+
+// ── Cloud Sync ─────────────────────────────────────────────────
+async function initSync() {
+  setSyncStatus("connecting");
+
+  const params = new URLSearchParams(window.location.search);
+  blobId = params.get("id");
+
+  if (blobId) {
+    const loaded = await loadFromCloud();
+    if (loaded) {
+      renderAll();
+      showShareLink();
+      startPolling();
+      setSyncStatus("synced");
+      return;
+    }
+  }
+
+  await createBlob();
+  showShareLink();
+  startPolling();
+  setSyncStatus("synced");
+}
+
+async function createBlob() {
+  try {
+    const data = { players, history };
+    const res = await fetch(BLOB_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const location = res.headers.get("Location") || res.headers.get("location");
+    if (location) {
+      blobId = location.split("/").pop();
+    } else {
+      const url = res.url || "";
+      blobId = url.split("/").pop();
+    }
+    if (blobId) {
+      window.history.replaceState(null, "", `?id=${blobId}`);
+    }
+  } catch (e) {
+    setSyncStatus("offline");
+  }
+}
+
+async function loadFromCloud() {
+  try {
+    const res = await fetch(`${BLOB_API}/${blobId}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (data.players) players = data.players;
+    if (data.history) history = data.history;
+    return true;
+  } catch (e) {
+    setSyncStatus("offline");
+    return false;
+  }
+}
+
+async function saveToCloud() {
+  if (!blobId) return;
+  setSyncStatus("saving");
+  try {
+    await fetch(`${BLOB_API}/${blobId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ players, history }),
+    });
+    setSyncStatus("synced");
+  } catch (e) {
+    setSyncStatus("offline");
+  }
+}
+
+function startPolling() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(async () => {
+    if (!blobId) return;
+    const loaded = await loadFromCloud();
+    if (loaded) {
+      renderAll();
+      setSyncStatus("synced");
+    }
+  }, SYNC_MS);
+}
+
+function showShareLink() {
+  if (!blobId) return;
+  const url = `${window.location.origin}${window.location.pathname}?id=${blobId}`;
+  shareLink.value = url;
+  shareBar.classList.remove("hidden");
+}
+
+function setSyncStatus(state) {
+  if (!syncStatus) return;
+  const labels = {
+    connecting: "\u{1F504} Connecting...",
+    synced:     "\u{2601}\uFE0F Synced",
+    saving:     "\u{1F4BE} Saving...",
+    offline:    "\u{1F4F4} Offline (local only)",
+  };
+  syncStatus.textContent = labels[state] || "";
+  syncStatus.className = `sync-status ${state}`;
+}
 
 // ── Rendering ──────────────────────────────────────────────────
 function renderAll() {
@@ -121,10 +241,10 @@ function renderHistory() {
   const recent = history.slice(-15).reverse();
   historyLog.innerHTML = recent.map(entry => {
     const cls = entry.type === "swear" ? "swear-entry" : "deed-entry";
-    const icon = entry.type === "swear" ? "🤬" : "😇";
+    const icon = entry.type === "swear" ? "\u{1F92C}" : "\u{1F607}";
     return `
       <li class="${cls}">
-        <span class="log-text">${icon} <strong>${entry.name}</strong> — ${entry.reaction}</span>
+        <span class="log-text">${icon} <strong>${entry.name}</strong> \u2014 ${entry.reaction}</span>
         <span class="log-time">${entry.time}</span>
       </li>`;
   }).join("");
@@ -151,31 +271,6 @@ function addHistory(name, type, reaction) {
   const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   history.push({ name, type, reaction, time });
   if (history.length > 50) history = history.slice(-50);
-}
-
-// ── Persistence ────────────────────────────────────────────────
-function loadPlayers() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try { return JSON.parse(saved); } catch (e) { /* fall through */ }
-  }
-  return DEFAULT_PLAYERS.map(p => ({ ...p }));
-}
-
-function savePlayers() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
-}
-
-function loadHistory() {
-  const saved = localStorage.getItem(HISTORY_KEY);
-  if (saved) {
-    try { return JSON.parse(saved); } catch (e) { /* fall through */ }
-  }
-  return [];
-}
-
-function saveHistory() {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
 // ── Utilities ──────────────────────────────────────────────────
