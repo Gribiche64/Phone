@@ -5,8 +5,8 @@
 
 // ── Config ─────────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
-const STORAGE_KEY = "florida-swear-chart";
-const HISTORY_KEY = "florida-swear-history";
+const STORAGE_KEY = "florida-swear-v2";
+const HISTORY_KEY = "florida-swear-history-v2";
 
 const DEFAULT_PLAYERS = [
   { name: "Meg",     avatar: "🌴", score: 2 },
