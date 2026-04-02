@@ -116,7 +116,7 @@ var GOOD_DEED_REACTIONS = ["Aww, how sweet!","Redemption arc!","Faith in humanit
 var RANK_LABELS = ["Potty Mouth Champion","Middle of the Road","Cleanest Mouth"];
 
 var players = loadLocal("players") || DEFAULT_PLAYERS.map(function(p){return{name:p.name,avatar:p.avatar,score:p.score}});
-var history = loadLocal("history") || [];
+var actLog = loadLocal("history") || [];
 
 var playerCardsEl = document.getElementById("player-cards");
 var playerSelect = document.getElementById("player-select");
@@ -177,7 +177,7 @@ function renderSelect(){
 }
 
 function renderHistory(){
-  var recent = history.slice(-15).reverse();
+  var recent = actLog.slice(-15).reverse();
   historyLog.innerHTML = recent.map(function(e){
     var cls = e.type==="swear"?"swear-entry":"deed-entry";
     var icon = e.type==="swear"?"\u{1F92C}":"\u{1F607}";
@@ -209,12 +209,12 @@ function animateCard(idx,anim,type,text){
 function addHistory(name,type,reaction){
   var now=new Date();
   var time=now.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-  history.push({name:name,type:type,reaction:reaction,time:time});
-  if(history.length>50) history=history.slice(-50);
+  actLog.push({name:name,type:type,reaction:reaction,time:time});
+  if(actLog.length>50) actLog=actLog.slice(-50);
 }
 
 function saveLocal(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(players));localStorage.setItem(HISTORY_KEY,JSON.stringify(history))}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(players));localStorage.setItem(HISTORY_KEY,JSON.stringify(actLog))}catch(e){}
 }
 
 function loadLocal(key){
