@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Florida Vacation Swear Chart</title>
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <div id="bubbles"></div>
@@ -12,16 +12,7 @@
   <header>
     <h1>Swear Jar</h1>
     <p class="subtitle">Florida Vacation Edition</p>
-    <div id="sync-status" class="sync-status connecting"></div>
   </header>
-
-  <section id="share-bar" class="hidden">
-    <label>Share this link so everyone sees the same scores:</label>
-    <div class="share-row">
-      <input type="text" id="share-link" readonly>
-      <button id="copy-btn">Copy</button>
-    </div>
-  </section>
 
   <main>
     <section id="scoreboard">
@@ -29,10 +20,11 @@
       <div id="player-cards"></div>
     </section>
 
+    <div id="reaction-toast" class="hidden"></div>
+
     <section id="controls">
-      <h2>Update Scores</h2>
+      <h2>Who said it?</h2>
       <div class="control-row">
-        <label for="player-select">Who?</label>
         <select id="player-select"></select>
       </div>
       <div class="action-buttons">
@@ -55,8 +47,9 @@
 
   <footer>
     <p>Florida Vacation 2026 &mdash; Keep it clean(ish)!</p>
+    <p class="footer-note">10 strikes and you're out!</p>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
