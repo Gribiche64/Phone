@@ -372,6 +372,21 @@ footer {
   color: var(--sunset-orange);
 }
 
+/* ── Navigation ──────────────────────────────────── */
+.page-nav {
+  margin-top: 1rem;
+  text-align: center;
+}
+.page-nav a {
+  color: var(--sand);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .95rem;
+  opacity: 0.85;
+  transition: opacity .2s;
+}
+.page-nav a:hover { opacity: 1; }
+
 /* ── Utility ─────────────────────────────────────── */
 .hidden { display: none !important; }
 

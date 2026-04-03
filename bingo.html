@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Bingo</title>
+  <link rel="stylesheet" href="bingo.css">
+</head>
+<body>
+  <div id="bubbles"></div>
+
+  <header>
+    <h1>Universal Bingo</h1>
+    <p class="subtitle">Spot it while you wait!</p>
+    <span id="sync-status" class="sync-badge synced">Live</span>
+  </header>
+
+  <main>
+    <section id="player-bar">
+      <label for="bingo-player">Playing as:</label>
+      <select id="bingo-player">
+        <option value="Meg">🌴 Meg</option>
+        <option value="Lincoln">🦎 Lincoln</option>
+        <option value="Kailer">🐊 Kailer</option>
+      </select>
+      <button id="new-card-btn" class="action-btn">🔀 New Card</button>
+    </section>
+
+    <section id="bingo-board"></section>
+
+    <div id="bingo-banner" class="hidden">
+      <span class="banner-text">🎉 BINGO! 🎉</span>
+    </div>
+
+    <section id="scoreboard-section">
+      <h2>Bingo Wins</h2>
+      <div id="bingo-scores"></div>
+    </section>
+
+    <nav class="page-nav">
+      <a href="index.html">← Back to Swear Jar</a>
+    </nav>
+  </main>
+
+  <footer>
+    <p>Florida Vacation 2026 &mdash; Epic Universe Edition</p>
+  </footer>
+
+  <script src="bingo.js"></script>
+</body>
+</html>
