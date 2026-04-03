@@ -65,9 +65,8 @@ const syncIndicator = document.getElementById("sync-status");
 
 // ── Initialize ─────────────────────────────────────────────────
 createBubbles();
-saveLocal();
-pushToFirebase();
 renderAll();
+// Fetch from Firebase first on load, don't push stale local data
 fetchFromFirebase();
 setInterval(fetchFromFirebase, 3000);
 
@@ -207,18 +206,27 @@ function pushToFirebase() {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-  }).then(() => { setSyncStatus("synced"); })
-    .catch(() => { setSyncStatus("offline"); });
+  }).then(r => {
+    if (r.ok) setSyncStatus("synced");
+    else setSyncStatus("offline");
+  }).catch(() => { setSyncStatus("offline"); });
 }
 
 function fetchFromFirebase() {
   if (syncInProgress) return;
   syncInProgress = true;
   fetch(FIREBASE_URL + "/swearChart.json")
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error("Firebase returned " + r.status);
+      return r.json();
+    })
     .then(data => {
       syncInProgress = false;
-      if (!data || !data.players) return;
+      if (!data || !data.players) {
+        // No remote data yet — push our local state as the first sync
+        pushToFirebase();
+        return;
+      }
       let changed = false;
       for (let i = 0; i < data.players.length; i++) {
         if (players[i] && players[i].score !== data.players[i].score) {
