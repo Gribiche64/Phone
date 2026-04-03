@@ -15,7 +15,7 @@ Phone/
 └── CLAUDE.md        # This file — guidance for AI assistants
 ```
 
-This is a **zero-dependency, static web app** — no build step, no framework, no package manager. All code is vanilla HTML, CSS, and JavaScript.
+This is a **zero-dependency, static web app** — no build step, no framework, no package manager. All code is vanilla HTML, CSS, and JavaScript. Cross-device sync uses the Firebase Realtime Database REST API (plain `fetch`, no SDK).
 
 ## Development Setup
 
@@ -50,16 +50,17 @@ Then visit `http://localhost:8000`.
 
 ### JavaScript (`script.js`)
 - **Player data:** Default players (Meg, Lincoln, Kailer) with avatars and starting scores
-- **Scoring:** -1 for swears, +1 for good deeds
-- **Reactions:** Random fun messages for each action
+- **Scoring:** +1 for swears, -1 for good deeds
+- **Reactions:** Random fun messages for each action (Universal/Epic Universe themed)
 - **History:** Timestamped activity log (last 50 entries)
-- **Persistence:** localStorage for scores and history
+- **Persistence:** localStorage for offline fallback, Firebase Realtime Database for cross-device sync
+- **Firebase sync:** Uses REST API (`fetch`) to push/poll data every 3 seconds — no SDK needed
 
 ## Key Files Quick Reference
 
 | File | Purpose | Key functions |
 |------|---------|---------------|
-| `script.js` | All app logic | `renderAll()`, `renderScoreboard()`, `animateCard()`, `addHistory()`, `savePlayers()` |
+| `script.js` | All app logic | `renderAll()`, `renderScoreboard()`, `animateCard()`, `addHistory()`, `saveLocal()`, `pushToFirebase()`, `fetchFromFirebase()` |
 | `style.css` | Styling | CSS custom properties in `:root`, `.player-card` animation system |
 | `index.html` | DOM structure | Section IDs: `scoreboard`, `controls`, `history-section` |
 
