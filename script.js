@@ -45,6 +45,8 @@ const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mou
 
 // ── State ──────────────────────────────────────────────────────
 let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
+// Always sync avatars from defaults in case they changed
+players.forEach((p, i) => { if (DEFAULT_PLAYERS[i]) p.avatar = DEFAULT_PLAYERS[i].avatar; });
 let history = loadLocal("history") || [];
 let syncInProgress = false;
 
