@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mario Slide Puzzle</title>
+  <link rel="stylesheet" href="puzzle.css">
+</head>
+<body>
+  <div id="bubbles"></div>
+
+  <header>
+    <h1>Slide Puzzle</h1>
+    <p class="subtitle">Super Mario Edition</p>
+  </header>
+
+  <main>
+    <section id="stats-bar">
+      <div class="stat"><span class="stat-label">Moves</span><span id="move-count" class="stat-value">0</span></div>
+      <div class="stat"><span class="stat-label">Time</span><span id="timer" class="stat-value">0:00</span></div>
+    </section>
+
+    <section id="puzzle-board"></section>
+
+    <div id="win-banner" class="hidden">
+      <span class="banner-text">⭐ You did it! ⭐</span>
+      <span id="win-stats" class="banner-sub"></span>
+    </div>
+
+    <section id="controls">
+      <div class="control-row">
+        <label for="size-select">Grid:</label>
+        <select id="size-select">
+          <option value="3">3 x 3</option>
+          <option value="4" selected>4 x 4</option>
+          <option value="5">5 x 5</option>
+        </select>
+        <button id="shuffle-btn" class="action-btn">🔀 Shuffle</button>
+      </div>
+    </section>
+
+    <nav class="page-nav">
+      <a href="index.html">← Back to Swear Jar</a>
+      <a href="bingo.html">🎰 Bingo</a>
+    </nav>
+  </main>
+
+  <footer>
+    <p>Florida Vacation 2026 &mdash; It's-a me!</p>
+  </footer>
+
+  <script src="puzzle.js"></script>
+</body>
+</html>

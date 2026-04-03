@@ -1,0 +1,282 @@
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --mario-red: #e52521;
+  --mario-blue: #049cd8;
+  --mario-yellow: #fbd000;
+  --mario-green: #43b047;
+  --mario-brown: #8c5a2c;
+  --mario-sky: #6b9eff;
+  --mario-dark: #1a1a2e;
+  --text-light: #ffffff;
+  --card-shadow: rgba(0, 0, 0, .2);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg, #6b9eff 0%, #049cd8 50%, #023e8a 100%);
+  color: var(--text-light);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Bubbles (clouds) ────────────────────────────── */
+#bubbles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+#bubbles .bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+  animation: float var(--dur) ease-in-out infinite;
+}
+@keyframes float {
+  0%   { transform: translateY(0) scale(1); opacity: 0.5; }
+  50%  { transform: translateY(-60px) scale(1.1); opacity: 0.3; }
+  100% { transform: translateY(0) scale(1); opacity: 0.5; }
+}
+
+/* ── Layout ──────────────────────────────────────── */
+header, main, footer {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 .75rem;
+}
+
+header {
+  text-align: center;
+  padding-top: 1.5rem;
+}
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  color: var(--text-light);
+  text-shadow: 3px 3px 0 var(--mario-red), 6px 6px 0 rgba(0,0,0,0.15);
+}
+.subtitle {
+  color: var(--mario-yellow);
+  font-style: italic;
+  font-size: 1rem;
+  margin-top: .25rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ── Stats Bar ───────────────────────────────────── */
+#stats-bar {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.stat {
+  text-align: center;
+}
+.stat-label {
+  display: block;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  opacity: 0.7;
+}
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+/* ── Puzzle Board ────────────────────────────────── */
+#puzzle-board {
+  margin: 1rem auto;
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+  padding: 6px;
+}
+
+.puzzle-tile {
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  box-shadow: 0 2px 6px var(--card-shadow);
+}
+.puzzle-tile:active {
+  transform: scale(0.95);
+}
+.puzzle-tile.empty {
+  background: transparent !important;
+  box-shadow: none;
+  cursor: default;
+}
+
+.tile-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.tile-number {
+  font-size: .65rem;
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  opacity: 0.5;
+}
+
+/* tile colors cycle through Mario palette */
+.puzzle-tile.t1  { background: linear-gradient(135deg, #e52521, #c41e1a); }
+.puzzle-tile.t2  { background: linear-gradient(135deg, #049cd8, #037bb5); }
+.puzzle-tile.t3  { background: linear-gradient(135deg, #43b047, #349038); }
+.puzzle-tile.t4  { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
+.puzzle-tile.t5  { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
+.puzzle-tile.t6  { background: linear-gradient(135deg, #f5a623, #d48e1a); }
+.puzzle-tile.t7  { background: linear-gradient(135deg, #9b59b6, #7d3f9b); }
+.puzzle-tile.t8  { background: linear-gradient(135deg, #e74c8b, #c43a73); }
+.puzzle-tile.t9  { background: linear-gradient(135deg, #1abc9c, #149e82); }
+.puzzle-tile.t10 { background: linear-gradient(135deg, #e52521, #c41e1a); }
+.puzzle-tile.t11 { background: linear-gradient(135deg, #049cd8, #037bb5); }
+.puzzle-tile.t12 { background: linear-gradient(135deg, #43b047, #349038); }
+.puzzle-tile.t13 { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
+.puzzle-tile.t14 { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
+.puzzle-tile.t15 { background: linear-gradient(135deg, #f5a623, #d48e1a); }
+.puzzle-tile.t16 { background: linear-gradient(135deg, #9b59b6, #7d3f9b); }
+.puzzle-tile.t17 { background: linear-gradient(135deg, #e74c8b, #c43a73); }
+.puzzle-tile.t18 { background: linear-gradient(135deg, #1abc9c, #149e82); }
+.puzzle-tile.t19 { background: linear-gradient(135deg, #e52521, #c41e1a); }
+.puzzle-tile.t20 { background: linear-gradient(135deg, #049cd8, #037bb5); }
+.puzzle-tile.t21 { background: linear-gradient(135deg, #43b047, #349038); }
+.puzzle-tile.t22 { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
+.puzzle-tile.t23 { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
+.puzzle-tile.t24 { background: linear-gradient(135deg, #f5a623, #d48e1a); }
+
+.puzzle-tile.correct {
+  box-shadow: 0 0 8px rgba(67, 176, 71, 0.5);
+}
+
+@keyframes tileSlide {
+  from { opacity: 0.7; }
+  to   { opacity: 1; }
+}
+
+/* ── Win Banner ──────────────────────────────────── */
+#win-banner {
+  text-align: center;
+  margin: .75rem auto;
+  padding: .75rem 1.5rem;
+  background: linear-gradient(135deg, var(--mario-yellow), #ffb700);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+  animation: bannerPulse 1s ease-in-out infinite;
+}
+.banner-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--mario-dark);
+  display: block;
+}
+.banner-sub {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--mario-brown);
+  display: block;
+  margin-top: .25rem;
+}
+@keyframes bannerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* ── Controls ────────────────────────────────────── */
+#controls {
+  margin-top: .75rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: .8rem;
+}
+.control-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .6rem;
+}
+.control-row label {
+  font-weight: 600;
+  font-size: .9rem;
+}
+#size-select {
+  padding: .4rem .8rem;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.action-btn {
+  padding: .5rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-light);
+  background: linear-gradient(135deg, var(--mario-red), #c41e1a);
+  box-shadow: 0 3px 10px rgba(229, 37, 33, 0.4);
+  transition: all .2s;
+}
+.action-btn:active { transform: scale(0.95); }
+
+/* ── Navigation ──────────────────────────────────── */
+.page-nav {
+  margin-top: 1.2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.page-nav a {
+  color: var(--mario-yellow);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .85rem;
+  opacity: 0.85;
+  transition: opacity .2s;
+}
+.page-nav a:hover { opacity: 1; }
+
+/* ── Footer ──────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: .8rem;
+  opacity: 0.7;
+}
+
+/* ── Utility ─────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 400px) {
+  header h1 { font-size: 1.8rem; }
+  .tile-emoji { font-size: 1.4rem; }
+  #puzzle-board { padding: 4px; gap: 2px; }
+}
