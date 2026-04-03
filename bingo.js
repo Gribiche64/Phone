@@ -91,6 +91,9 @@ const BINGO_ITEMS = [
   "\"Where's the bathroom?\"",
   "\"My feet hurt\"",
   "\"Can we eat soon?\"",
+  // Family specials
+  "Kid scoots along the line on his butt",
+  "Kid clips water bottle to the rail and holds up the line",
 ];
 
 const PLAYERS = [
