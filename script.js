@@ -1,12 +1,13 @@
 /* ================================================================
    Florida Vacation Swear Chart
-   Scores persist in localStorage on the scorekeeper's phone.
+   Scores persist in localStorage and sync via Firebase Realtime DB.
    ================================================================ */
 
 // ── Config ─────────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
 const STORAGE_KEY = "florida-swear-v2";
 const HISTORY_KEY = "florida-swear-history-v2";
+const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
   { name: "Meg",     avatar: "🌴", score: 2 },
@@ -43,44 +44,50 @@ const GOOD_DEED_REACTIONS = [
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
 
 // ── State ──────────────────────────────────────────────────────
-var players = loadLocal("players") || DEFAULT_PLAYERS.map(function(p) { return { name: p.name, avatar: p.avatar, score: p.score }; });
-var history = loadLocal("history") || [];
+let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
+let history = loadLocal("history") || [];
+let syncInProgress = false;
 
 // ── DOM References ─────────────────────────────────────────────
-var playerCardsEl = document.getElementById("player-cards");
-var playerSelect = document.getElementById("player-select");
-var swearBtn = document.getElementById("swear-btn");
-var goodDeedBtn = document.getElementById("good-deed-btn");
-var historyLog = document.getElementById("history-log");
-var bubblesEl = document.getElementById("bubbles");
-var reactionEl = document.getElementById("reaction-toast");
+const playerCardsEl = document.getElementById("player-cards");
+const playerSelect = document.getElementById("player-select");
+const swearBtn = document.getElementById("swear-btn");
+const goodDeedBtn = document.getElementById("good-deed-btn");
+const historyLog = document.getElementById("history-log");
+const bubblesEl = document.getElementById("bubbles");
+const reactionEl = document.getElementById("reaction-toast");
+const syncIndicator = document.getElementById("sync-status");
 
 // ── Initialize ─────────────────────────────────────────────────
-try { createBubbles(); } catch (e) {}
+createBubbles();
 renderAll();
+fetchFromFirebase();
+setInterval(fetchFromFirebase, 3000);
 
 // ── Event Listeners ────────────────────────────────────────────
-swearBtn.addEventListener("click", function() {
-  var idx = parseInt(playerSelect.value, 10);
+swearBtn.addEventListener("click", () => {
+  const idx = parseInt(playerSelect.value, 10);
   if (players[idx].score >= DISQUALIFY_AT) return;
   players[idx].score += 1;
-  var reaction = players[idx].score >= DISQUALIFY_AT
+  const reaction = players[idx].score >= DISQUALIFY_AT
     ? "DISQUALIFIED! 10 strikes and you're OUT!"
     : pickRandom(SWEAR_REACTIONS);
   addHistory(players[idx].name, "swear", reaction);
   saveLocal();
+  pushToFirebase();
   renderAll();
   animateCard(idx, "shake", "bad", "+1");
   showReaction(reaction);
 });
 
-goodDeedBtn.addEventListener("click", function() {
-  var idx = parseInt(playerSelect.value, 10);
+goodDeedBtn.addEventListener("click", () => {
+  const idx = parseInt(playerSelect.value, 10);
   if (players[idx].score <= 0) return;
   players[idx].score -= 1;
-  var reaction = pickRandom(GOOD_DEED_REACTIONS);
+  const reaction = pickRandom(GOOD_DEED_REACTIONS);
   addHistory(players[idx].name, "deed", reaction);
   saveLocal();
+  pushToFirebase();
   renderAll();
   animateCard(idx, "glow", "good", "-1");
   showReaction(reaction);
@@ -94,30 +101,30 @@ function renderAll() {
 }
 
 function renderScoreboard() {
-  var sorted = players
-    .map(function(p, i) { return { name: p.name, avatar: p.avatar, score: p.score, idx: i }; })
-    .sort(function(a, b) { return b.score - a.score; });
+  const sorted = players
+    .map((p, i) => ({ ...p, idx: i }))
+    .sort((a, b) => b.score - a.score);
 
-  playerCardsEl.innerHTML = sorted.map(function(p, rank) {
-    var disqualified = p.score >= DISQUALIFY_AT;
-    var danger = p.score >= 7;
-    var scoreClass = disqualified ? "disqualified" : danger ? "danger" : p.score > 0 ? "warning" : "clean";
-    var rankLabel = disqualified ? "DISQUALIFIED" : RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
-    var cardClass = "player-card" + (disqualified ? " disqualified-card" : "");
-    return '<div class="' + cardClass + '" data-rank="' + (rank + 1) + '" data-idx="' + p.idx + '">'
-      + '<span class="player-avatar">' + p.avatar + '</span>'
-      + '<div class="player-name">' + p.name + '</div>'
-      + '<div class="player-score ' + scoreClass + '">' + p.score + ' / ' + DISQUALIFY_AT + '</div>'
-      + '<div class="score-bar"><div class="score-fill" style="width:' + (p.score / DISQUALIFY_AT * 100) + '%"></div></div>'
-      + '<div class="player-rank">' + rankLabel + '</div>'
-      + '</div>';
+  playerCardsEl.innerHTML = sorted.map((p, rank) => {
+    const disqualified = p.score >= DISQUALIFY_AT;
+    const danger = p.score >= 7;
+    const scoreClass = disqualified ? "disqualified" : danger ? "danger" : p.score > 0 ? "warning" : "clean";
+    const rankLabel = disqualified ? "DISQUALIFIED" : RANK_LABELS[Math.min(rank, RANK_LABELS.length - 1)];
+    const cardClass = "player-card" + (disqualified ? " disqualified-card" : "");
+    return `<div class="${cardClass}" data-rank="${rank + 1}" data-idx="${p.idx}">
+      <span class="player-avatar">${p.avatar}</span>
+      <div class="player-name">${p.name}</div>
+      <div class="player-score ${scoreClass}">${p.score} / ${DISQUALIFY_AT}</div>
+      <div class="score-bar"><div class="score-fill" style="width:${p.score / DISQUALIFY_AT * 100}%"></div></div>
+      <div class="player-rank">${rankLabel}</div>
+    </div>`;
   }).join("");
 }
 
 function renderSelect() {
-  var currentVal = playerSelect.value;
+  const currentVal = playerSelect.value;
   playerSelect.innerHTML = players
-    .map(function(p, i) { return '<option value="' + i + '">' + p.avatar + ' ' + p.name + '</option>'; })
+    .map((p, i) => `<option value="${i}">${p.avatar} ${p.name}</option>`)
     .join("");
   if (currentVal !== "" && currentVal < players.length) {
     playerSelect.value = currentVal;
@@ -125,14 +132,14 @@ function renderSelect() {
 }
 
 function renderHistory() {
-  var recent = history.slice(-15).reverse();
-  historyLog.innerHTML = recent.map(function(entry) {
-    var cls = entry.type === "swear" ? "swear-entry" : "deed-entry";
-    var icon = entry.type === "swear" ? "🤬" : "😇";
-    return '<li class="' + cls + '">'
-      + '<span class="log-text">' + icon + ' <strong>' + entry.name + '</strong> — ' + entry.reaction + '</span>'
-      + '<span class="log-time">' + entry.time + '</span>'
-      + '</li>';
+  const recent = history.slice(-15).reverse();
+  historyLog.innerHTML = recent.map(entry => {
+    const cls = entry.type === "swear" ? "swear-entry" : "deed-entry";
+    const icon = entry.type === "swear" ? "🤬" : "😇";
+    return `<li class="${cls}">
+      <span class="log-text">${icon} <strong>${entry.name}</strong> — ${entry.reaction}</span>
+      <span class="log-time">${entry.time}</span>
+    </li>`;
   }).join("");
 }
 
@@ -142,30 +149,30 @@ function showReaction(text) {
   reactionEl.textContent = text;
   reactionEl.classList.remove("hidden");
   reactionEl.classList.remove("fade-out");
-  setTimeout(function() { reactionEl.classList.add("fade-out"); }, 1500);
-  setTimeout(function() { reactionEl.classList.add("hidden"); }, 2200);
+  setTimeout(() => { reactionEl.classList.add("fade-out"); }, 1500);
+  setTimeout(() => { reactionEl.classList.add("hidden"); }, 2200);
 }
 
 // ── Animations ─────────────────────────────────────────────────
 function animateCard(playerIdx, animClass, changeType, changeText) {
-  var card = playerCardsEl.querySelector('[data-idx="' + playerIdx + '"]');
+  const card = playerCardsEl.querySelector(`[data-idx="${playerIdx}"]`);
   if (!card) return;
 
   card.classList.add(animClass);
-  setTimeout(function() { card.classList.remove(animClass); }, 600);
+  setTimeout(() => { card.classList.remove(animClass); }, 600);
 
-  var pop = document.createElement("div");
+  const pop = document.createElement("div");
   pop.className = "score-change " + changeType;
   pop.textContent = changeText;
   card.appendChild(pop);
-  setTimeout(function() { pop.remove(); }, 800);
+  setTimeout(() => { pop.remove(); }, 800);
 }
 
 // ── History Management ─────────────────────────────────────────
 function addHistory(name, type, reaction) {
-  var now = new Date();
-  var time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  history.push({ name: name, type: type, reaction: reaction, time: time });
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  history.push({ name, type, reaction, time });
   if (history.length > 50) history = history.slice(-50);
 }
 
@@ -179,11 +186,63 @@ function saveLocal() {
 
 function loadLocal(key) {
   try {
-    var k = key === "players" ? STORAGE_KEY : HISTORY_KEY;
-    var raw = localStorage.getItem(k);
+    const k = key === "players" ? STORAGE_KEY : HISTORY_KEY;
+    const raw = localStorage.getItem(k);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
   return null;
+}
+
+// ── Firebase Sync ─────────────────────────────────────────────
+function pushToFirebase() {
+  const data = { players, history };
+  fetch(FIREBASE_URL + "/swearChart.json", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(() => { setSyncStatus("synced"); })
+    .catch(() => { setSyncStatus("offline"); });
+}
+
+function fetchFromFirebase() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  fetch(FIREBASE_URL + "/swearChart.json")
+    .then(r => r.json())
+    .then(data => {
+      syncInProgress = false;
+      if (!data || !data.players) return;
+      let changed = false;
+      for (let i = 0; i < data.players.length; i++) {
+        if (players[i] && players[i].score !== data.players[i].score) {
+          changed = true;
+          break;
+        }
+      }
+      let histChanged = data.history && data.history.length !== history.length;
+      if (changed || histChanged) {
+        players = data.players;
+        if (data.history) history = data.history;
+        saveLocal();
+        renderAll();
+      }
+      setSyncStatus("synced");
+    })
+    .catch(() => {
+      syncInProgress = false;
+      setSyncStatus("offline");
+    });
+}
+
+function setSyncStatus(status) {
+  if (!syncIndicator) return;
+  if (status === "synced") {
+    syncIndicator.textContent = "Live";
+    syncIndicator.className = "sync-badge synced";
+  } else {
+    syncIndicator.textContent = "Offline";
+    syncIndicator.className = "sync-badge offline";
+  }
 }
 
 // ── Utilities ──────────────────────────────────────────────────
@@ -192,10 +251,10 @@ function pickRandom(arr) {
 }
 
 function createBubbles() {
-  for (var i = 0; i < 20; i++) {
-    var bubble = document.createElement("div");
+  for (let i = 0; i < 20; i++) {
+    const bubble = document.createElement("div");
     bubble.className = "bubble";
-    var size = Math.random() * 40 + 10;
+    const size = Math.random() * 40 + 10;
     bubble.style.width = size + "px";
     bubble.style.height = size + "px";
     bubble.style.left = Math.random() * 100 + "%";

@@ -344,6 +344,20 @@ header h1 {
   to   { opacity: 1; transform: translateX(0); }
 }
 
+/* ── Sync Badge ─────────────────────────────────── */
+.sync-badge {
+  display: inline-block;
+  margin-top: .5rem;
+  padding: .2rem .7rem;
+  border-radius: 20px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.sync-badge.synced { background: rgba(45, 106, 79, 0.85); color: #fff; }
+.sync-badge.offline { background: rgba(230, 57, 70, 0.85); color: #fff; }
+
 /* ── Footer ──────────────────────────────────────── */
 footer {
   text-align: center;
