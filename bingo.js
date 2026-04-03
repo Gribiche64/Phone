@@ -7,6 +7,7 @@ const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 const BINGO_STORAGE = "universal-bingo-v1";
 
 const BINGO_ITEMS = [
+  // Classic line observations
   "Someone in a wizard robe",
   "Butterbeer spotted",
   "Kid having a meltdown",
@@ -47,6 +48,49 @@ const BINGO_ITEMS = [
   "Someone buys a wand",
   "Queue movie spotted",
   "Crocs in the wild",
+  // People watching
+  "Socks with sandals",
+  "Adult throwing a tantrum",
+  "Someone eating while walking",
+  "Group can't agree where to go",
+  "Someone wearing yesterday's wristband",
+  "Kid on a leash backpack",
+  "Full costume not on an employee",
+  "Someone asks \"how long is the wait?\"",
+  "Person holding spot for 10 people",
+  "Someone sits on the ground in line",
+  "Couple arguing over the map",
+  "Kid begging for a toy",
+  "Someone wearing a cape",
+  "Person filming a TikTok",
+  "Entire family on their phones",
+  // Food & drink moments
+  "Ice cream dripping on someone's hand",
+  "Giant pretzel spotted",
+  "Someone carrying 4+ drinks",
+  "Churro sighting",
+  "Someone refills a water bottle at a fountain",
+  "Popcorn bucket bigger than a kid's head",
+  // Ride & park moments
+  "Someone chickens out of a ride",
+  "Loose item warning ignored",
+  "Someone's hat flies off on a ride",
+  "Employee doing a countdown",
+  "Flash photography on a dark ride",
+  "Someone tries to bring food on a ride",
+  "Single rider flex",
+  "Gift shop right after a ride exit",
+  "Spray fan or mist station crowd",
+  "Someone sits in a wet seat",
+  // Overheard gems
+  "\"This is my favorite ride\"",
+  "\"I'm not tired\" (clearly tired)",
+  "\"We'll come back later\" (they won't)",
+  "\"It's not that scary\" (it is)",
+  "\"Just one more thing from the gift shop\"",
+  "\"Where's the bathroom?\"",
+  "\"My feet hurt\"",
+  "\"Can we eat soon?\"",
 ];
 
 const PLAYERS = [
