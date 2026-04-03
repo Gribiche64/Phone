@@ -46,7 +46,10 @@ const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mou
 // ── State ──────────────────────────────────────────────────────
 let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
 // Always sync avatars from defaults in case they changed
-players.forEach((p, i) => { if (DEFAULT_PLAYERS[i]) p.avatar = DEFAULT_PLAYERS[i].avatar; });
+function applyDefaultAvatars() {
+  players.forEach((p, i) => { if (DEFAULT_PLAYERS[i]) p.avatar = DEFAULT_PLAYERS[i].avatar; });
+}
+applyDefaultAvatars();
 let history = loadLocal("history") || [];
 let syncInProgress = false;
 
@@ -62,6 +65,8 @@ const syncIndicator = document.getElementById("sync-status");
 
 // ── Initialize ─────────────────────────────────────────────────
 createBubbles();
+saveLocal();
+pushToFirebase();
 renderAll();
 fetchFromFirebase();
 setInterval(fetchFromFirebase, 3000);
@@ -225,6 +230,7 @@ function fetchFromFirebase() {
       if (changed || histChanged) {
         players = data.players;
         if (data.history) history = data.history;
+        applyDefaultAvatars();
         saveLocal();
         renderAll();
       }
