@@ -11,34 +11,34 @@ const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
   { name: "Meg",     avatar: "🌴", score: 2 },
-  { name: "Lincoln", avatar: "🦩", score: 2 },
+  { name: "Lincoln", avatar: "🦎", score: 2 },
   { name: "Kailer",  avatar: "🐊", score: 3 },
 ];
 
 const SWEAR_REACTIONS = [
-  "Ooh, language!",
-  "Soap, anyone?",
-  "The seagulls heard that!",
-  "Not in front of the dolphins!",
-  "That cost ya!",
-  "Grandma would NOT approve.",
-  "The palm trees are blushing.",
-  "Florida Man would be proud...",
-  "Drop it in the swear jar!",
-  "Watch your mouth, beach bum!",
+  "Voldemort heard that one!",
+  "Even Hagrid would blush!",
+  "That's a Howler-level offense!",
+  "The Minions are SHOCKED.",
+  "Shrek just covered Donkey's ears.",
+  "Butterbeer can't wash that mouth out!",
+  "You kiss your Patronus with that mouth?",
+  "That word is banned in Hogsmeade!",
+  "Velociraptor-level foul language!",
+  "The Grinch just clutched his pearls.",
 ];
 
 const GOOD_DEED_REACTIONS = [
-  "Aww, how sweet!",
-  "Redemption arc!",
-  "Faith in humanity restored.",
-  "A true Florida angel.",
-  "Gold star for you!",
-  "That's the spirit!",
-  "Making grandma proud!",
-  "Wholesome beach vibes!",
-  "You've earned some sunscreen karma.",
-  "The manatees approve!",
+  "Dumbledore awards 10 points!",
+  "You've unlocked a golden ticket!",
+  "Even Scooby-Doo is impressed!",
+  "That's some superhero energy!",
+  "The Sorting Hat says... SAINT!",
+  "Ollivander would craft you a wand!",
+  "Universal would give you a fast pass for that!",
+  "Dobby is a free elf thanks to you!",
+  "You just earned a dragon egg!",
+  "Standing ovation from the Minions!",
 ];
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
