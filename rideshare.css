@@ -1,0 +1,366 @@
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --sand: #f5e6c8;
+  --ocean: #0077b6;
+  --ocean-deep: #023e8a;
+  --ocean-light: #00b4d8;
+  --sunset-orange: #ff6b35;
+  --sunset-pink: #ff477e;
+  --palm-green: #2d6a4f;
+  --sky: #caf0f8;
+  --text: #023047;
+  --text-light: #ffffff;
+  --card-shadow: rgba(0, 0, 0, .15);
+  --gold: #ffd700;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg, #87CEEB 0%, #00b4d8 40%, #0077b6 70%, #023e8a 100%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Bubbles ─────────────────────────────────────── */
+#bubbles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+#bubbles .bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(255,255,255,0.05));
+  animation: float var(--dur) ease-in-out infinite;
+}
+@keyframes float {
+  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%  { transform: translateY(-80px) scale(1.1); opacity: 0.3; }
+  100% { transform: translateY(0) scale(1); opacity: 0.6; }
+}
+
+/* ── Layout ──────────────────────────────────────── */
+header, main, footer {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 .75rem;
+}
+
+header {
+  text-align: center;
+  padding-top: 1.5rem;
+}
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  color: var(--text-light);
+  text-shadow: 3px 3px 0 var(--sunset-orange), 6px 6px 0 rgba(0,0,0,0.1);
+}
+.subtitle {
+  color: var(--sand);
+  font-style: italic;
+  font-size: 1rem;
+  margin-top: .25rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+.pitch {
+  margin-top: .5rem;
+  color: var(--sky);
+  font-size: .85rem;
+  font-weight: 500;
+  opacity: .9;
+}
+
+/* ── Trip Form ───────────────────────────────────── */
+#trip-form {
+  margin-top: 1.25rem;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 18px var(--card-shadow);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  grid-column-gap: .5rem;
+  align-items: center;
+  margin-bottom: .55rem;
+}
+.form-row label {
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--ocean-deep);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row select {
+  grid-column: 2;
+  padding: .55rem .7rem;
+  border-radius: 10px;
+  border: 2px solid rgba(0, 119, 182, 0.25);
+  background: #fff;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+  width: 100%;
+}
+.form-row .preset-select {
+  grid-column: 2;
+  margin-bottom: .35rem;
+  font-size: .85rem;
+  padding: .4rem .6rem;
+  background: rgba(202, 240, 248, 0.6);
+  border: 2px dashed rgba(0, 119, 182, 0.3);
+  cursor: pointer;
+}
+.form-row .preset-select + input {
+  margin-top: 0;
+}
+
+#compare-btn {
+  width: 100%;
+  margin-top: .5rem;
+  padding: .85rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-pink));
+  color: var(--text-light);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.4);
+  transition: transform .15s, box-shadow .15s;
+}
+#compare-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.35);
+}
+#compare-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Trip Summary ────────────────────────────────── */
+#trip-summary {
+  margin-top: 1rem;
+  background: rgba(2, 62, 138, 0.85);
+  color: var(--text-light);
+  border-radius: 14px;
+  padding: .8rem 1rem;
+  box-shadow: 0 4px 14px var(--card-shadow);
+}
+.summary-line {
+  font-size: .95rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: .55rem;
+  line-height: 1.35;
+}
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .35rem;
+}
+.summary-stats .stat {
+  text-align: center;
+}
+.summary-stats .stat-label {
+  display: block;
+  font-size: .65rem;
+  color: var(--sand);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.summary-stats .stat-value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: .15rem;
+}
+
+/* ── Results ─────────────────────────────────────── */
+#results {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+}
+
+.ride-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 14px;
+  padding: .75rem .9rem;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  box-shadow: 0 3px 12px var(--card-shadow);
+  border-left: 4px solid transparent;
+  position: relative;
+  animation: cardIn .35s ease-out backwards;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ride-card .ride-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.ride-card .ride-info {
+  min-width: 0;
+}
+.ride-card .ride-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+.ride-card .ride-meta {
+  font-size: .78rem;
+  color: #5a6b78;
+  margin-top: .15rem;
+  line-height: 1.25;
+}
+.ride-card .surge-pill {
+  display: inline-block;
+  margin-left: .35rem;
+  padding: .05rem .45rem;
+  border-radius: 8px;
+  background: rgba(255, 107, 53, 0.18);
+  color: var(--sunset-orange);
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.ride-card .ride-price {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ocean-deep);
+  text-align: right;
+  line-height: 1;
+}
+.ride-card .ride-price small {
+  display: block;
+  font-size: .65rem;
+  font-weight: 600;
+  color: #6c7a87;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-top: .2rem;
+}
+
+.ride-card.best {
+  border-left-color: var(--palm-green);
+  box-shadow: 0 4px 18px rgba(45, 106, 79, 0.35);
+}
+.ride-card.best::before {
+  content: 'BEST DEAL';
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  background: linear-gradient(135deg, var(--palm-green), #40916c);
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  padding: .2rem .55rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(45, 106, 79, 0.4);
+}
+.ride-card.best .ride-price {
+  color: var(--palm-green);
+}
+
+.ride-card.unavailable {
+  opacity: 0.55;
+  filter: grayscale(0.3);
+}
+.ride-card.unavailable .ride-price {
+  font-size: .9rem;
+  color: #99a4ad;
+}
+
+/* Brand colors */
+.logo-uber  { background: #000; }
+.logo-lyft  { background: #ff00bf; }
+.logo-bolt  { background: #34d186; }
+.logo-curb  { background: #f6c23e; color: #222; }
+.logo-taxi  { background: #fdd835; color: #222; }
+.logo-via   { background: #0066ff; }
+
+/* ── Disclaimer ──────────────────────────────────── */
+.disclaimer {
+  margin-top: .9rem;
+  text-align: center;
+  color: var(--sky);
+  font-size: .75rem;
+  opacity: 0.85;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ── Navigation ──────────────────────────────────── */
+.page-nav {
+  margin-top: 1.2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.page-nav a {
+  color: var(--sand);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .9rem;
+  opacity: 0.85;
+  transition: opacity .2s;
+}
+.page-nav a:hover { opacity: 1; }
+
+/* ── Footer ──────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--sand);
+  font-size: .8rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ── Utility ─────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 400px) {
+  header h1 { font-size: 1.9rem; }
+  .form-row { grid-template-columns: 60px 1fr; }
+  .form-row label { font-size: .75rem; }
+  .ride-card { grid-template-columns: 38px 1fr auto; padding: .6rem .7rem; }
+  .ride-card .ride-logo { width: 38px; height: 38px; font-size: 1.1rem; }
+  .ride-card .ride-price { font-size: 1.15rem; }
+}

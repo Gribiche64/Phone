@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ride Compare</title>
+  <link rel="stylesheet" href="rideshare.css">
+</head>
+<body>
+  <div id="bubbles"></div>
+
+  <header>
+    <h1>Ride Compare</h1>
+    <p class="subtitle">Cheapest ride wins 🏁</p>
+    <p class="pitch">Meg's business idea — one tap, every rideshare app, side by side.</p>
+  </header>
+
+  <main>
+    <section id="trip-form">
+      <div class="form-row">
+        <label for="pickup">From</label>
+        <select id="pickup-preset" class="preset-select">
+          <option value="">— quick pick —</option>
+        </select>
+        <input id="pickup" type="text" placeholder="Pickup address" autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <label for="dropoff">To</label>
+        <select id="dropoff-preset" class="preset-select">
+          <option value="">— quick pick —</option>
+        </select>
+        <input id="dropoff" type="text" placeholder="Drop-off address" autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <label for="ride-class">Ride type</label>
+        <select id="ride-class">
+          <option value="standard">Standard (up to 4)</option>
+          <option value="xl">XL / SUV (up to 6)</option>
+          <option value="premium">Premium / Black</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="riders">Riders</label>
+        <input id="riders" type="number" min="1" max="6" value="2">
+      </div>
+
+      <button id="compare-btn" class="action-btn">🔍 Compare prices</button>
+    </section>
+
+    <section id="trip-summary" class="hidden">
+      <div class="summary-line">
+        <span id="summary-route"></span>
+      </div>
+      <div class="summary-stats">
+        <div class="stat"><span class="stat-label">Distance</span><span id="summary-distance" class="stat-value">—</span></div>
+        <div class="stat"><span class="stat-label">Est. time</span><span id="summary-time" class="stat-value">—</span></div>
+        <div class="stat"><span class="stat-label">Demand</span><span id="summary-surge" class="stat-value">—</span></div>
+      </div>
+    </section>
+
+    <section id="results"></section>
+
+    <p id="disclaimer" class="disclaimer hidden">
+      Prices simulated for demo. A real version would query each app's API live.
+    </p>
+
+    <nav class="page-nav">
+      <a href="index.html">← Swear Jar</a>
+      <a href="bingo.html">🎰 Bingo</a>
+      <a href="puzzle.html">🍄 Puzzle</a>
+    </nav>
+  </main>
+
+  <footer>
+    <p>Florida Vacation 2026 &mdash; Cheapest ride to the parks!</p>
+  </footer>
+
+  <script src="rideshare.js"></script>
+</body>
+</html>
