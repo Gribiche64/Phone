@@ -2,20 +2,20 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --mario-red: #e52521;
-  --mario-blue: #049cd8;
-  --mario-yellow: #fbd000;
-  --mario-green: #43b047;
-  --mario-brown: #8c5a2c;
-  --mario-sky: #6b9eff;
-  --mario-dark: #1a1a2e;
+  --mario-red: #c44e5c;
+  --mario-blue: #1a6b8a;
+  --mario-yellow: #d4a03a;
+  --mario-green: #2d5a3f;
+  --mario-brown: #6b4a2a;
+  --mario-sky: #7ab5cc;
+  --mario-dark: #0d3b4f;
   --text-light: #ffffff;
   --card-shadow: rgba(0, 0, 0, .2);
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(180deg, #6b9eff 0%, #049cd8 50%, #023e8a 100%);
+  background: linear-gradient(180deg, #7ab5cc 0%, #3a8fa8 40%, #1a6b8a 70%, #0d3b4f 100%);
   color: var(--text-light);
   min-height: 100vh;
   overflow-x: hidden;

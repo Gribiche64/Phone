@@ -1,8 +1,8 @@
-# CLAUDE.md — Florida Vacation Swear Chart
+# CLAUDE.md — Michigan Summer Swear Chart
 
 ## Project Overview
 
-**Florida Vacation Swear Chart** is a web-based interactive score tracker for tracking swear word penalties and good deed redemptions during a Florida vacation. Players lose points for swearing and earn them back for good deeds. The repository is hosted on GitHub at `Gribiche64/Phone` and deployed via GitHub Pages.
+**Michigan Summer Swear Chart** is a web-based interactive score tracker for tracking swear word penalties and good deed redemptions during a Michigan summer. Players lose points for swearing and earn them back for good deeds. The repository is hosted on GitHub at `Gribiche64/Phone` and deployed via GitHub Pages.
 
 ## Repository Structure
 
@@ -43,7 +43,7 @@ Then visit `http://localhost:8000`.
 - Activity history log
 
 ### CSS (`style.css`)
-- CSS custom properties (`:root` variables) for theming — ocean/sand/sunset palette
+- CSS custom properties (`:root` variables) for theming — Michigan lakes/forest/sunset palette
 - Animated floating bubbles background
 - Card animations: shake (swear), glow (good deed), score pop-ups
 - Fully responsive at 600px breakpoint
@@ -51,7 +51,7 @@ Then visit `http://localhost:8000`.
 ### JavaScript (`script.js`)
 - **Player data:** Default players (Meg, Lincoln, Kailer) with avatars and starting scores
 - **Scoring:** +1 for swears, -1 for good deeds
-- **Reactions:** Random fun messages for each action (Universal/Epic Universe themed)
+- **Reactions:** Random fun messages for each action (Michigan summer themed)
 - **History:** Timestamped activity log (last 50 entries)
 - **Persistence:** localStorage for offline fallback, Firebase Realtime Database for cross-device sync
 - **Firebase sync:** Uses REST API (`fetch`) to push/poll data every 3 seconds — no SDK needed

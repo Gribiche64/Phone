@@ -2,15 +2,15 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --sand: #f5e6c8;
-  --ocean: #0077b6;
-  --ocean-deep: #023e8a;
-  --ocean-light: #00b4d8;
-  --sunset-orange: #ff6b35;
-  --sunset-pink: #ff477e;
-  --palm-green: #2d6a4f;
-  --sky: #caf0f8;
-  --text: #023047;
+  --sand: #e8dcc8;
+  --ocean: #1a6b8a;
+  --ocean-deep: #0d3b4f;
+  --ocean-light: #3a9fbf;
+  --sunset-orange: #d4783a;
+  --sunset-pink: #c44e5c;
+  --palm-green: #2d5a3f;
+  --sky: #c5dde8;
+  --text: #1a2e3a;
   --text-light: #ffffff;
   --card-shadow: rgba(0, 0, 0, .15);
   --gold: #ffd700;
@@ -18,7 +18,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(180deg, #87CEEB 0%, #00b4d8 40%, #0077b6 70%, #023e8a 100%);
+  background: linear-gradient(180deg, #7ab5cc 0%, #3a8fa8 30%, #1a6b8a 60%, #0d3b4f 100%);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;

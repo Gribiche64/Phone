@@ -1,44 +1,44 @@
 /* ================================================================
-   Florida Vacation Swear Chart
+   Michigan Summer Swear Chart
    Scores persist in localStorage and sync via Firebase Realtime DB.
    ================================================================ */
 
 // ── Config ─────────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
-const STORAGE_KEY = "florida-swear-v2";
-const HISTORY_KEY = "florida-swear-history-v2";
+const STORAGE_KEY = "michigan-swear-v1";
+const HISTORY_KEY = "michigan-swear-history-v1";
 const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
-  { name: "Meg",     avatar: "🌴", score: 2 },
-  { name: "Lincoln", avatar: "🦎", score: 2 },
-  { name: "Kailer",  avatar: "🐊", score: 3 },
+  { name: "Meg",     avatar: "🌊", score: 0 },
+  { name: "Lincoln", avatar: "🦎", score: 0 },
+  { name: "Kailer",  avatar: "🏕️", score: 0 },
 ];
 
 const SWEAR_REACTIONS = [
-  "Voldemort heard that one!",
-  "Even Hagrid would blush!",
-  "That's a Howler-level offense!",
-  "The Minions are SHOCKED.",
-  "Shrek just covered Donkey's ears.",
-  "Butterbeer can't wash that mouth out!",
-  "You kiss your Patronus with that mouth?",
-  "That word is banned in Hogsmeade!",
-  "Velociraptor-level foul language!",
-  "The Grinch just clutched his pearls.",
+  "The loons on the lake heard that!",
+  "Not in front of the Petoskey stones!",
+  "That word sank to the bottom of Lake Michigan.",
+  "Even a black bear would blush!",
+  "The Mackinac fudge just went sour.",
+  "That's not Up North behavior!",
+  "The lighthouse is judging you.",
+  "Say that again and you're sleeping in the tent.",
+  "The mosquitoes are repeating it now.",
+  "Grandma's cottage has a no-swearing policy!",
 ];
 
 const GOOD_DEED_REACTIONS = [
-  "Dumbledore awards 10 points!",
-  "You've unlocked a golden ticket!",
-  "Even Scooby-Doo is impressed!",
-  "That's some superhero energy!",
-  "The Sorting Hat says... SAINT!",
-  "Ollivander would craft you a wand!",
-  "Universal would give you a fast pass for that!",
-  "Dobby is a free elf thanks to you!",
-  "You just earned a dragon egg!",
-  "Standing ovation from the Minions!",
+  "Pure Michigan moment right there!",
+  "You earned an extra s'more tonight.",
+  "The sunset over the dunes approves.",
+  "That's Mackinac Island-level kindness!",
+  "A loon just sang in your honor.",
+  "You've earned first pick of the kayaks.",
+  "The campfire burns brighter for you.",
+  "Cherry Republic would give you a free sample!",
+  "Sleeping Bear Dunes salutes you.",
+  "You just earned a Vernors on the porch.",
 ];
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
