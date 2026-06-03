@@ -5,8 +5,8 @@
 
 // ── Config ─────────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
-const STORAGE_KEY = "michigan-swear-v1";
-const HISTORY_KEY = "michigan-swear-history-v1";
+const STORAGE_KEY = "michigan-swear-v2";
+const HISTORY_KEY = "michigan-swear-history-v2";
 const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
@@ -16,29 +16,33 @@ const DEFAULT_PLAYERS = [
 ];
 
 const SWEAR_REACTIONS = [
-  "The loons on the lake heard that!",
-  "Not in front of the Petoskey stones!",
-  "That word sank to the bottom of Lake Michigan.",
-  "Even a black bear would blush!",
-  "The Mackinac fudge just went sour.",
-  "That's not Up North behavior!",
-  "The lighthouse is judging you.",
-  "Say that again and you're sleeping in the tent.",
-  "The mosquitoes are repeating it now.",
-  "Grandma's cottage has a no-swearing policy!",
+  "The geese at the lake heard that!",
+  "You just scared the fish off the pontoon!",
+  "That word echoed across the whole lake.",
+  "The jet ski stalled from the shock.",
+  "Not in the lakehouse! Take it to the dock.",
+  "The geese are honking in disapproval.",
+  "Meijer doesn't sell that kind of language.",
+  "All of Lapeer County just heard you.",
+  "The pontoon boat captain is NOT amused.",
+  "You're on dish duty at the lakehouse now.",
+  "Even the bass in the lake are offended.",
+  "That's a Vernors-revoking offense.",
 ];
 
 const GOOD_DEED_REACTIONS = [
+  "You earned captain's chair on the pontoon!",
+  "First turn on the jet ski is yours.",
+  "The geese are honking in approval.",
+  "That's lakehouse MVP behavior right there.",
+  "You've earned a Meijer run of your choice.",
+  "Lapeer's finest right here!",
+  "You get the good Adirondack chair tonight.",
+  "Extra time on the jet ski for you!",
+  "The lake is calmer because of your kindness.",
+  "You've earned a sunset pontoon cruise.",
   "Pure Michigan moment right there!",
-  "You earned an extra s'more tonight.",
-  "The sunset over the dunes approves.",
-  "That's Mackinac Island-level kindness!",
-  "A loon just sang in your honor.",
-  "You've earned first pick of the kayaks.",
-  "The campfire burns brighter for you.",
-  "Cherry Republic would give you a free sample!",
-  "Sleeping Bear Dunes salutes you.",
-  "You just earned a Vernors on the porch.",
+  "The whole dock is clapping for you.",
 ];
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
