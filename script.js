@@ -5,8 +5,9 @@
 
 // ── Config ─────────────────────────────────────────────────────
 const DISQUALIFY_AT = 10;
-const STORAGE_KEY = "michigan-swear-v2";
-const HISTORY_KEY = "michigan-swear-history-v2";
+const STORAGE_KEY = "michigan-swear-v3";
+const HISTORY_KEY = "michigan-swear-history-v3";
+const FIREBASE_PATH = "/michiganSwear.json";
 const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
@@ -49,7 +50,8 @@ const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mou
 
 // ── Wipe stale data from old versions ─────────────────────────
 ["florida-swear-v2", "florida-swear-history-v2", "michigan-swear-v1",
- "michigan-swear-history-v1"].forEach(k => localStorage.removeItem(k));
+ "michigan-swear-history-v1", "michigan-swear-v2", "michigan-swear-history-v2"
+].forEach(k => localStorage.removeItem(k));
 
 // ── State ──────────────────────────────────────────────────────
 let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
@@ -209,7 +211,7 @@ function loadLocal(key) {
 // ── Firebase Sync ─────────────────────────────────────────────
 function pushToFirebase() {
   const data = { players, history };
-  fetch(FIREBASE_URL + "/swearChart.json", {
+  fetch(FIREBASE_URL + FIREBASE_PATH, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -222,7 +224,7 @@ function pushToFirebase() {
 function fetchFromFirebase() {
   if (syncInProgress) return;
   syncInProgress = true;
-  fetch(FIREBASE_URL + "/swearChart.json")
+  fetch(FIREBASE_URL + FIREBASE_PATH)
     .then(r => {
       if (!r.ok) throw new Error("Firebase returned " + r.status);
       return r.json();
