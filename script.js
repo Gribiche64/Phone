@@ -47,9 +47,12 @@ const GOOD_DEED_REACTIONS = [
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
 
+// ── Wipe stale data from old versions ─────────────────────────
+["florida-swear-v2", "florida-swear-history-v2", "michigan-swear-v1",
+ "michigan-swear-history-v1"].forEach(k => localStorage.removeItem(k));
+
 // ── State ──────────────────────────────────────────────────────
 let players = loadLocal("players") || DEFAULT_PLAYERS.map(p => ({ ...p }));
-// Always sync avatars from defaults in case they changed
 function applyDefaultAvatars() {
   players.forEach((p, i) => { if (DEFAULT_PLAYERS[i]) p.avatar = DEFAULT_PLAYERS[i].avatar; });
 }
