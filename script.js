@@ -97,7 +97,6 @@ swearBtn.addEventListener("click", () => {
 
 goodDeedBtn.addEventListener("click", () => {
   const idx = parseInt(playerSelect.value, 10);
-  if (players[idx].score <= 0) return;
   players[idx].score -= 1;
   const reaction = pickRandom(GOOD_DEED_REACTIONS);
   addHistory(players[idx].name, "deed", reaction);
