@@ -2,27 +2,27 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --mario-red: #c44e5c;
-  --mario-blue: #1a6b8a;
-  --mario-yellow: #d4a03a;
-  --mario-green: #2d5a3f;
-  --mario-brown: #6b4a2a;
-  --mario-sky: #7ab5cc;
-  --mario-dark: #0d3b4f;
+  --fall-red: #a63d40;
+  --fall-brown: #8b4513;
+  --fall-gold: #c47f3a;
+  --fall-green: #5a6e3a;
+  --fall-dark: #3d1f0e;
+  --fall-amber: #d4a574;
+  --fall-deep: #6b3a2a;
   --text-light: #ffffff;
   --card-shadow: rgba(0, 0, 0, .2);
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(180deg, #7ab5cc 0%, #3a8fa8 40%, #1a6b8a 70%, #0d3b4f 100%);
+  background: linear-gradient(180deg, #d4a574 0%, #b5703a 40%, #8b4513 70%, #3d1f0e 100%);
   color: var(--text-light);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* ── Bubbles (clouds) ────────────────────────────── */
+/* ── Bubbles ────────────────────────────── */
 #bubbles {
   position: fixed;
   inset: 0;
@@ -33,7 +33,7 @@ body {
 #bubbles .bubble {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+  background: radial-gradient(circle at 30% 30%, rgba(212, 165, 116, 0.5), rgba(180, 100, 40, 0.1));
   animation: float var(--dur) ease-in-out infinite;
 }
 @keyframes float {
@@ -60,10 +60,10 @@ header h1 {
   font-weight: 800;
   letter-spacing: .05em;
   color: var(--text-light);
-  text-shadow: 3px 3px 0 var(--mario-red), 6px 6px 0 rgba(0,0,0,0.15);
+  text-shadow: 3px 3px 0 var(--fall-red), 6px 6px 0 rgba(0,0,0,0.15);
 }
 .subtitle {
-  color: var(--mario-yellow);
+  color: var(--fall-gold);
   font-style: italic;
   font-size: 1rem;
   margin-top: .25rem;
@@ -139,34 +139,34 @@ header h1 {
   opacity: 0.5;
 }
 
-/* tile colors cycle through Mario palette */
-.puzzle-tile.t1  { background: linear-gradient(135deg, #e52521, #c41e1a); }
-.puzzle-tile.t2  { background: linear-gradient(135deg, #049cd8, #037bb5); }
-.puzzle-tile.t3  { background: linear-gradient(135deg, #43b047, #349038); }
-.puzzle-tile.t4  { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
-.puzzle-tile.t5  { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
-.puzzle-tile.t6  { background: linear-gradient(135deg, #f5a623, #d48e1a); }
-.puzzle-tile.t7  { background: linear-gradient(135deg, #9b59b6, #7d3f9b); }
-.puzzle-tile.t8  { background: linear-gradient(135deg, #e74c8b, #c43a73); }
-.puzzle-tile.t9  { background: linear-gradient(135deg, #1abc9c, #149e82); }
-.puzzle-tile.t10 { background: linear-gradient(135deg, #e52521, #c41e1a); }
-.puzzle-tile.t11 { background: linear-gradient(135deg, #049cd8, #037bb5); }
-.puzzle-tile.t12 { background: linear-gradient(135deg, #43b047, #349038); }
-.puzzle-tile.t13 { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
-.puzzle-tile.t14 { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
-.puzzle-tile.t15 { background: linear-gradient(135deg, #f5a623, #d48e1a); }
-.puzzle-tile.t16 { background: linear-gradient(135deg, #9b59b6, #7d3f9b); }
-.puzzle-tile.t17 { background: linear-gradient(135deg, #e74c8b, #c43a73); }
-.puzzle-tile.t18 { background: linear-gradient(135deg, #1abc9c, #149e82); }
-.puzzle-tile.t19 { background: linear-gradient(135deg, #e52521, #c41e1a); }
-.puzzle-tile.t20 { background: linear-gradient(135deg, #049cd8, #037bb5); }
-.puzzle-tile.t21 { background: linear-gradient(135deg, #43b047, #349038); }
-.puzzle-tile.t22 { background: linear-gradient(135deg, #fbd000, #d4b000); color: #333; }
-.puzzle-tile.t23 { background: linear-gradient(135deg, #8c5a2c, #6e4722); }
-.puzzle-tile.t24 { background: linear-gradient(135deg, #f5a623, #d48e1a); }
+/* tile colors — warm autumn palette */
+.puzzle-tile.t1  { background: linear-gradient(135deg, #c44e3a, #a63d2e); }
+.puzzle-tile.t2  { background: linear-gradient(135deg, #d4883a, #b57030); }
+.puzzle-tile.t3  { background: linear-gradient(135deg, #8b6b3a, #6e5528); }
+.puzzle-tile.t4  { background: linear-gradient(135deg, #5a6e3a, #45562c); }
+.puzzle-tile.t5  { background: linear-gradient(135deg, #a63d40, #8b2832); }
+.puzzle-tile.t6  { background: linear-gradient(135deg, #c47f3a, #a66a2e); }
+.puzzle-tile.t7  { background: linear-gradient(135deg, #6b4a2a, #553a20); }
+.puzzle-tile.t8  { background: linear-gradient(135deg, #d4623a, #b5502e); }
+.puzzle-tile.t9  { background: linear-gradient(135deg, #7a8a3a, #626e2e); }
+.puzzle-tile.t10 { background: linear-gradient(135deg, #8b3a3a, #6e2e2e); }
+.puzzle-tile.t11 { background: linear-gradient(135deg, #b5703a, #965c2e); }
+.puzzle-tile.t12 { background: linear-gradient(135deg, #5a5a3a, #45452c); }
+.puzzle-tile.t13 { background: linear-gradient(135deg, #c44e3a, #a63d2e); }
+.puzzle-tile.t14 { background: linear-gradient(135deg, #d4883a, #b57030); }
+.puzzle-tile.t15 { background: linear-gradient(135deg, #8b6b3a, #6e5528); }
+.puzzle-tile.t16 { background: linear-gradient(135deg, #5a6e3a, #45562c); }
+.puzzle-tile.t17 { background: linear-gradient(135deg, #a63d40, #8b2832); }
+.puzzle-tile.t18 { background: linear-gradient(135deg, #c47f3a, #a66a2e); }
+.puzzle-tile.t19 { background: linear-gradient(135deg, #6b4a2a, #553a20); }
+.puzzle-tile.t20 { background: linear-gradient(135deg, #d4623a, #b5502e); }
+.puzzle-tile.t21 { background: linear-gradient(135deg, #7a8a3a, #626e2e); }
+.puzzle-tile.t22 { background: linear-gradient(135deg, #8b3a3a, #6e2e2e); }
+.puzzle-tile.t23 { background: linear-gradient(135deg, #b5703a, #965c2e); }
+.puzzle-tile.t24 { background: linear-gradient(135deg, #5a5a3a, #45452c); }
 
 .puzzle-tile.correct {
-  box-shadow: 0 0 8px rgba(67, 176, 71, 0.5);
+  box-shadow: 0 0 8px rgba(90, 110, 58, 0.5);
 }
 
 @keyframes tileSlide {
@@ -179,21 +179,21 @@ header h1 {
   text-align: center;
   margin: .75rem auto;
   padding: .75rem 1.5rem;
-  background: linear-gradient(135deg, var(--mario-yellow), #ffb700);
+  background: linear-gradient(135deg, var(--fall-gold), #d4a03a);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 4px 20px rgba(196, 127, 58, 0.5);
   animation: bannerPulse 1s ease-in-out infinite;
 }
 .banner-text {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--mario-dark);
+  color: var(--fall-dark);
   display: block;
 }
 .banner-sub {
   font-size: .85rem;
   font-weight: 600;
-  color: var(--mario-brown);
+  color: var(--fall-deep);
   display: block;
   margin-top: .25rem;
 }
@@ -239,8 +239,8 @@ header h1 {
   font-weight: 700;
   cursor: pointer;
   color: var(--text-light);
-  background: linear-gradient(135deg, var(--mario-red), #c41e1a);
-  box-shadow: 0 3px 10px rgba(229, 37, 33, 0.4);
+  background: linear-gradient(135deg, var(--fall-red), #8b2832);
+  box-shadow: 0 3px 10px rgba(166, 61, 64, 0.4);
   transition: all .2s;
 }
 .action-btn:active { transform: scale(0.95); }
@@ -254,7 +254,7 @@ header h1 {
   gap: 1.5rem;
 }
 .page-nav a {
-  color: var(--mario-yellow);
+  color: var(--fall-gold);
   text-decoration: none;
   font-weight: 600;
   font-size: .85rem;

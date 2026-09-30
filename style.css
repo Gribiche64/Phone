@@ -2,29 +2,29 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --sand: #e8dcc8;
-  --ocean: #1a6b8a;
-  --ocean-deep: #0d3b4f;
-  --ocean-light: #3a9fbf;
-  --sunset-orange: #d4783a;
-  --sunset-pink: #c44e5c;
-  --palm-green: #2d5a3f;
-  --sky: #c5dde8;
-  --text: #1a2e3a;
+  --sand: #f5e6c8;
+  --ocean: #8b4513;
+  --ocean-deep: #3d1f0e;
+  --ocean-light: #c47f3a;
+  --sunset-orange: #d4623a;
+  --sunset-pink: #a63d40;
+  --palm-green: #5a6e3a;
+  --sky: #f5e0b8;
+  --text: #2a1810;
   --text-light: #ffffff;
   --card-shadow: rgba(0, 0, 0, .15);
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(180deg, #7ab5cc 0%, #3a8fa8 30%, #1a6b8a 60%, #0d3b4f 100%);
+  background: linear-gradient(180deg, #d4a574 0%, #b5703a 30%, #8b4513 60%, #3d1f0e 100%);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* ── Animated bubbles background ─────────────────── */
+/* ── Animated leaves background ─────────────────── */
 #bubbles {
   position: fixed;
   inset: 0;
@@ -35,7 +35,7 @@ body {
 #bubbles .bubble {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(255,255,255,0.05));
+  background: radial-gradient(circle at 30% 30%, rgba(212, 165, 116, 0.5), rgba(180, 100, 40, 0.1));
   animation: float var(--dur) ease-in-out infinite;
 }
 @keyframes float {
@@ -116,9 +116,9 @@ header h1 {
   top: 0; left: 0; right: 0;
   height: 5px;
 }
-.player-card[data-rank="1"]::before { background: linear-gradient(90deg, var(--sunset-pink), #e63946); }
-.player-card[data-rank="2"]::before { background: linear-gradient(90deg, var(--sunset-orange), #e8890c); }
-.player-card[data-rank="3"]::before { background: linear-gradient(90deg, var(--palm-green), #40916c); }
+.player-card[data-rank="1"]::before { background: linear-gradient(90deg, var(--sunset-pink), #8b2020); }
+.player-card[data-rank="2"]::before { background: linear-gradient(90deg, var(--sunset-orange), #b5703a); }
+.player-card[data-rank="3"]::before { background: linear-gradient(90deg, var(--palm-green), #6b8a3a); }
 
 .player-avatar {
   font-size: 2rem;
@@ -139,7 +139,7 @@ header h1 {
 .player-score.clean { color: var(--palm-green); }
 .player-score.warning { color: var(--sunset-orange); }
 .player-score.danger { color: var(--sunset-pink); }
-.player-score.disqualified { color: #e63946; text-decoration: line-through; }
+.player-score.disqualified { color: #8b2020; text-decoration: line-through; }
 
 .score-bar {
   width: 100%;
@@ -161,7 +161,7 @@ header h1 {
   filter: grayscale(0.4);
 }
 .disqualified-card .player-rank {
-  color: #e63946;
+  color: #8b2020;
   font-weight: 700;
 }
 
@@ -206,7 +206,7 @@ header h1 {
 
 @keyframes cardGlow {
   0%, 100% { box-shadow: 0 4px 16px var(--card-shadow); }
-  50% { box-shadow: 0 4px 24px rgba(45, 106, 79, 0.5); }
+  50% { box-shadow: 0 4px 24px rgba(90, 110, 58, 0.5); }
 }
 .player-card.glow {
   animation: cardGlow .6s ease-in-out;
@@ -288,22 +288,22 @@ header h1 {
 .action-btn .btn-icon { font-size: 1.3rem; }
 
 .action-btn.swear {
-  background: linear-gradient(135deg, var(--sunset-pink), #e63946);
-  box-shadow: 0 4px 14px rgba(255, 71, 126, 0.4);
+  background: linear-gradient(135deg, var(--sunset-pink), #8b2020);
+  box-shadow: 0 4px 14px rgba(166, 61, 64, 0.4);
 }
 .action-btn.swear:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 71, 126, 0.6);
+  box-shadow: 0 6px 20px rgba(166, 61, 64, 0.6);
 }
 .action-btn.swear:active { transform: scale(0.97); }
 
 .action-btn.good-deed {
-  background: linear-gradient(135deg, var(--palm-green), #40916c);
-  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.4);
+  background: linear-gradient(135deg, var(--palm-green), #6b8a3a);
+  box-shadow: 0 4px 14px rgba(90, 110, 58, 0.4);
 }
 .action-btn.good-deed:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.6);
+  box-shadow: 0 6px 20px rgba(90, 110, 58, 0.6);
 }
 .action-btn.good-deed:active { transform: scale(0.97); }
 
@@ -355,8 +355,8 @@ header h1 {
   letter-spacing: .05em;
   text-transform: uppercase;
 }
-.sync-badge.synced { background: rgba(45, 106, 79, 0.85); color: #fff; }
-.sync-badge.offline { background: rgba(230, 57, 70, 0.85); color: #fff; }
+.sync-badge.synced { background: rgba(90, 110, 58, 0.85); color: #fff; }
+.sync-badge.offline { background: rgba(166, 61, 64, 0.85); color: #fff; }
 
 /* ── Footer ──────────────────────────────────────── */
 footer {

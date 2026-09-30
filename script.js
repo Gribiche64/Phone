@@ -1,5 +1,5 @@
 /* ================================================================
-   Michigan Summer Swear Chart
+   Michigan Fall Swear Chart
    Scores persist in localStorage and sync via Firebase Realtime DB.
    ================================================================ */
 
@@ -11,39 +11,39 @@ const FIREBASE_PATH = "/michiganSwear.json";
 const FIREBASE_URL = "https://swear-jar-fca22-default-rtdb.firebaseio.com";
 
 const DEFAULT_PLAYERS = [
-  { name: "Meg",     avatar: "🌊", score: 0 },
+  { name: "Meg",     avatar: "🍂", score: 0 },
   { name: "Lincoln", avatar: "🦎", score: 0 },
-  { name: "Kailer",  avatar: "🏕️", score: 0 },
+  { name: "Kailer",  avatar: "🏈", score: 0 },
 ];
 
 const SWEAR_REACTIONS = [
-  "The geese at the lake heard that!",
-  "You just scared the fish off the pontoon!",
-  "That word echoed across the whole lake.",
-  "The jet ski stalled from the shock.",
-  "Not in the lakehouse! Take it to the dock.",
-  "The geese are honking in disapproval.",
-  "Meijer doesn't sell that kind of language.",
+  "The apple cider just curdled from that language!",
+  "You scared all the leaves off the tree.",
+  "That word echoed across the whole corn maze.",
+  "Not in front of the pumpkin patch!",
   "All of Lapeer County just heard you.",
-  "The pontoon boat captain is NOT amused.",
-  "You're on dish duty at the lakehouse now.",
-  "Even the bass in the lake are offended.",
-  "That's a Vernors-revoking offense.",
+  "The geese flying south just turned around to judge you.",
+  "Meijer doesn't sell that kind of language.",
+  "That's a cider-doughnut-revoking offense.",
+  "You're on leaf-raking duty now.",
+  "Even the deer in the woods are offended.",
+  "The bonfire just went out from the shock.",
+  "The hayride driver is NOT amused.",
 ];
 
 const GOOD_DEED_REACTIONS = [
-  "You earned captain's chair on the pontoon!",
-  "First turn on the jet ski is yours.",
-  "The geese are honking in approval.",
-  "That's lakehouse MVP behavior right there.",
-  "You've earned a Meijer run of your choice.",
+  "You earned the warm seat by the bonfire!",
+  "First cup of hot cider is yours.",
+  "The geese are honking in approval as they fly south.",
+  "That's Michigan fall MVP behavior right there.",
+  "You've earned a Meijer cider doughnut run.",
   "Lapeer's finest right here!",
-  "You get the good Adirondack chair tonight.",
-  "Extra time on the jet ski for you!",
-  "The lake is calmer because of your kindness.",
-  "You've earned a sunset pontoon cruise.",
+  "You get the coziest flannel tonight.",
+  "Extra s'mores by the bonfire for you!",
+  "The leaves are falling in your honor.",
+  "You've earned a sunset hayride.",
   "Pure Michigan moment right there!",
-  "The whole dock is clapping for you.",
+  "The whole corn maze is cheering for you.",
 ];
 
 const RANK_LABELS = ["Potty Mouth Champion", "Middle of the Road", "Cleanest Mouth"];
